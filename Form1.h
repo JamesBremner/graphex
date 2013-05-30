@@ -274,6 +274,8 @@ private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs
 			 // update the layout
 			 theGraph.Arrange();
 
+			 theGraph.MapColor();
+
 			 // display the graph panel
 			 HideAll();
 			 myCurDisplay = graph;

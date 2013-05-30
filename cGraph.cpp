@@ -54,6 +54,23 @@ void cGraph::Arrange()
 		p->setXY(x+200,y+200);
 		p++;
 	}
+}
+
+void cGraph::MapColor()
+{
+	
+
+	// set size of color map to number of vertices in graph
+	myColorMap.resize(num_vertices(myGraph));
+
+	// adapt color_map vector so it can be used by sequential_vertex_coloring
+	typedef boost::property_map<graph_t, boost::vertex_index_t>::const_type vertex_index_map;
+	boost::iterator_property_map<std::vector<unsigned int>::iterator, vertex_index_map>
+		color(myColorMap.begin(), get(boost::vertex_index, myGraph));
+
+	// assign colors to vertices
+	int num_colors = boost::sequential_vertex_coloring(myGraph, color );
+
 
 }
 void cGraph::DrawLayout( System::Drawing::Graphics^ g )
@@ -69,21 +86,33 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 				 myVertex[b].x, myVertex[b].y );
 	}
 
+	int kv = 0;
 	for( vertex_iter_t p = myVertex.begin();
 		p != myVertex.end(); p++ )
 	{
-		p->Draw( g );
+		p->Draw( g, myColorMap[kv] );
+		kv++;
 	}
 
 }
-void cVertex::Draw( System::Drawing::Graphics^ g )
+void cVertex::Draw( System::Drawing::Graphics^ g, int coloridx )
 {
 	using namespace System::Drawing;
 
 	// Represent vertex with a box
 	const int box_size = 30;
-	g->FillRectangle(gcnew SolidBrush( Color::LightGreen ),
+	SolidBrush^ brush = gcnew SolidBrush(Color::LightGreen);
+	brush->Color = Color::LightGreen;
+	switch( coloridx ) {
+		case 0: brush->Color = Color::LightGreen; break;
+		case 1: brush->Color = Color::Red; break;
+		case 2: brush->Color = Color::Blue; break;
+		case 3: brush->Color = Color::Yellow; break;
+		default: brush->Color = Color::Black; break;
+	}
+	g->FillRectangle( brush,
 		x-box_size/2,y-box_size/2,box_size,box_size);
+
 	// label the vertex
 	g->DrawString(gcnew System::String(myName.c_str()), 
 		gcnew Font( "Arial",16 ),

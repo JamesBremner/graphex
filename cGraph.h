@@ -6,7 +6,8 @@ public:
 		myName = n;
 	}
 	void setXY( int X, int Y )	{ x = X, y = Y; }
-	void Draw( System::Drawing::Graphics^ g );
+	void Draw( System::Drawing::Graphics^ g,
+		int coloridx );
 
 
 	std::wstring myName;
@@ -45,7 +46,10 @@ public:
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
+
 	void Arrange();
+	void MapColor();
+
 	void NameVertex( int i,  System::String^ n )
 	{
 		if( 0 > i || i >= (int)myVertex.size() )
@@ -62,16 +66,19 @@ public:
 
 private:
 	typedef boost::square_topology<>::point_type point;
+	typedef boost::property< boost::vertex_index_t, int,
+			boost::property< vertex_position_t, point,
+			boost::property< boost::vertex_color_t, float > > >
+				vertex_props_t;
  	typedef boost::adjacency_list <
 		boost::listS, boost::vecS, boost::bidirectionalS,
-		// Vertex properties
-		boost::property<
-			boost::vertex_index_t, int,
-			boost::property<vertex_position_t, point> >
-	> graph_t;
+		vertex_props_t >
+				graph_t;
+
 	graph_t myGraph;
 
 	std::vector< cVertex > myVertex;
+	std::vector<unsigned int> myColorMap;
 
 	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter;
 	edge_iter ei, ei_end;
