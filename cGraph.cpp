@@ -38,6 +38,11 @@ void cGraph::AddVertex()
 	static int vertex_index = 1;
 	boost::add_vertex( vertex_index++, myGraph );
 }
+/**
+
+  Arrange the vertices in a circle
+
+*/
 void cGraph::Arrange()
 {
 
@@ -55,11 +60,13 @@ void cGraph::Arrange()
 		p++;
 	}
 }
+/**
 
+   assign colors to vertices
+
+*/
 void cGraph::MapColor()
 {
-	
-
 	// set size of color map to number of vertices in graph
 	myColorMap.resize(num_vertices(myGraph));
 
@@ -73,9 +80,22 @@ void cGraph::MapColor()
 
 
 }
+/**
+
+  Draw graph on screen
+
+  @param[in] g The graphics context of the window where the drawing is reuired
+
+*/
 void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 {
 	using namespace System::Drawing;
+
+	/** Draw the edges
+
+	This is done first so that the vertexes will overwrite the edges
+
+	*/
 	int a,b;
 	edge_iter ei, ei_end;
 	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
@@ -86,6 +106,7 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 				 myVertex[b].x, myVertex[b].y );
 	}
 
+	// Draw the vertices
 	int kv = 0;
 	for( vertex_iter_t p = myVertex.begin();
 		p != myVertex.end(); p++ )
@@ -95,20 +116,26 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 	}
 
 }
+/**
+
+  Draw vertex on screen
+
+  @param[in] g The graphics context of the window where the drawing is reuired
+  @param[in] coloridx  The index of the color to be used
+
+*/
 void cVertex::Draw( System::Drawing::Graphics^ g, int coloridx )
 {
 	using namespace System::Drawing;
 
-	// Represent vertex with a box
+	// Represent vertex with a box of specified color
 	const int box_size = 30;
-	SolidBrush^ brush = gcnew SolidBrush(Color::LightGreen);
-	brush->Color = Color::LightGreen;
+	SolidBrush^ brush = gcnew SolidBrush(Color::Black);
 	switch( coloridx ) {
 		case 0: brush->Color = Color::LightGreen; break;
 		case 1: brush->Color = Color::Red; break;
 		case 2: brush->Color = Color::Blue; break;
 		case 3: brush->Color = Color::Yellow; break;
-		default: brush->Color = Color::Black; break;
 	}
 	g->FillRectangle( brush,
 		x-box_size/2,y-box_size/2,box_size,box_size);
