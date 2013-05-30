@@ -1,8 +1,8 @@
 ========================================================================
-    APPLICATION : graphex Project Overview
+    GRAPHEX : The Raven's Point Graph Explorer.  
 ========================================================================
 
-The Raven's Point Graph Explorer.  
+
 
 - Add named vertices
 - Connect vertices with an edge

@@ -60,7 +60,7 @@ void cGraph::Arrange()
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
 		int x = (int)position[*vi][0];
 		int y = (int)position[*vi][1];
-		p->setXY(x+100,y+100);
+		p->setXY(x+200,y+200);
 		p++;
 	}
 

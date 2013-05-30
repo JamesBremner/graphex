@@ -256,9 +256,15 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 
 		 void DrawVertex( Graphics^ g, cGraph::vertex_iter_t& p )
 		 {
+			 // Represent vertex with a box
+			 const int box_size = 30;
+			 g->FillRectangle(gcnew SolidBrush( Color::LightGreen ),
+				p->x-box_size/2,p->y-box_size/2,box_size,box_size);
+			 // label the vertex
 			g->DrawString(gcnew String(p->myName.c_str()), 
 				gcnew System::Drawing::Font( "Arial",16 ),
-				gcnew SolidBrush( Color::Black ),(float)p->x,(float)p->y);
+				gcnew SolidBrush( Color::Black ),
+				(float)p->x-box_size/2,(float)p->y-box_size/2);
 		 }
 
 		 void DrawEdge(  Graphics^ g, int va, int vb )
@@ -280,16 +286,17 @@ private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs
 			 graphpanel->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
 			   Graphics^ g = graphpanel->CreateGraphics();
 
-			for( cGraph::vertex_iter_t p = theGraph.beginVertex();
-				p != theGraph.endVertex(); p++ )
-			{
-				DrawVertex( g, p );
-			}
 			int a,b;
 			bool more_edges = theGraph.firstEdge( a, b );
 			while( more_edges ) {
 				DrawEdge( g, a, b );
 				more_edges = theGraph.nextEdge( a, b );
+			}
+
+			for( cGraph::vertex_iter_t p = theGraph.beginVertex();
+				p != theGraph.endVertex(); p++ )
+			{
+				DrawVertex( g, p );
 			}
 
 			delete g;
