@@ -6,6 +6,7 @@ public:
 		myName = n;
 	}
 	void setXY( int X, int Y )	{ x = X, y = Y; }
+	void Draw( System::Drawing::Graphics^ g );
 
 
 	std::wstring myName;
@@ -57,6 +58,7 @@ public:
 	vertex_iter_t  getVertex( int i );
 	bool firstEdge( int& a, int& b );
 	bool nextEdge( int& a, int& b );
+	void DrawLayout( System::Drawing::Graphics^ g );
 
 private:
 	typedef boost::square_topology<>::point_type point;

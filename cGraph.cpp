@@ -40,15 +40,6 @@ void cGraph::AddVertex()
 }
 void cGraph::Arrange()
 {
-	//int k = 0;
-	//for( vertex_iter_t p = beginVertex();
-	//	p != endVertex(); p++ )
-	//{
-	//	int x = ( k % 3 ) * 50;
-	//	int y = ( k / 3 ) * 100;
-	//	p->setXY(x,y);
-	//	k++;
-	//}
 
 	boost::property_map<graph_t, vertex_position_t>::type
 		position = get(vertex_position, myGraph);
@@ -64,6 +55,38 @@ void cGraph::Arrange()
 		p++;
 	}
 
+}
+void cGraph::DrawLayout( System::Drawing::Graphics^ g )
+{
+	using namespace System::Drawing;
+	int a,b;
+	edge_iter ei, ei_end;
+	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
+		a=source(*ei,myGraph);
+		b=target(*ei,myGraph);
+		g->DrawLine( gcnew Pen(Color::Black, 3),
+				 myVertex[a].x, myVertex[a].y,
+				 myVertex[b].x, myVertex[b].y );
+	}
 
+	for( vertex_iter_t p = myVertex.begin();
+		p != myVertex.end(); p++ )
+	{
+		p->Draw( g );
+	}
 
+}
+void cVertex::Draw( System::Drawing::Graphics^ g )
+{
+	using namespace System::Drawing;
+
+	// Represent vertex with a box
+	const int box_size = 30;
+	g->FillRectangle(gcnew SolidBrush( Color::LightGreen ),
+		x-box_size/2,y-box_size/2,box_size,box_size);
+	// label the vertex
+	g->DrawString(gcnew System::String(myName.c_str()), 
+		gcnew Font( "Arial",16 ),
+		gcnew SolidBrush( Color::Black ),
+		(float)x-box_size/2,(float)y-box_size/2);
 }

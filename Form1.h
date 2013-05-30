@@ -263,28 +263,6 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 
 		 }
 
-		 void DrawVertex( Graphics^ g, cGraph::vertex_iter_t& p )
-		 {
-			 // Represent vertex with a box
-			 const int box_size = 30;
-			 g->FillRectangle(gcnew SolidBrush( Color::LightGreen ),
-				p->x-box_size/2,p->y-box_size/2,box_size,box_size);
-			 // label the vertex
-			g->DrawString(gcnew String(p->myName.c_str()), 
-				gcnew System::Drawing::Font( "Arial",16 ),
-				gcnew SolidBrush( Color::Black ),
-				(float)p->x-box_size/2,(float)p->y-box_size/2);
-		 }
-
-		 void DrawEdge(  Graphics^ g, int va, int vb )
-		 {
-			 cGraph::vertex_iter_t pa = theGraph.getVertex( va );
-			 cGraph::vertex_iter_t pb = theGraph.getVertex( vb );
-			 g->DrawLine( gcnew Pen(Color::Black, 3),
-				 pa->x, pa->y,
-				 pb->x, pb->y );
-
-		 }
 
 		 /**
 
@@ -330,7 +308,7 @@ private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System
 
 /**
 
-  Paint the graph layour panel
+  Paint the graph layout panel
 
 */
 private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
@@ -338,18 +316,8 @@ private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows:
 			 if( myCurDisplay != graph ) {
 				 return;
 			 }
-			 int a,b;
-			 bool more_edges = theGraph.firstEdge( a, b );
-			 while( more_edges ) {
-				 DrawEdge( e->Graphics, a, b );
-				 more_edges = theGraph.nextEdge( a, b );
-			 }
+			 theGraph.DrawLayout( e->Graphics );
 
-			 for( cGraph::vertex_iter_t p = theGraph.beginVertex();
-				 p != theGraph.endVertex(); p++ )
-			 {
-				 DrawVertex( e->Graphics, p );
-			 }
 		 }
 };
 }
