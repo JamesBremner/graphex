@@ -258,7 +258,7 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 		 {
 			g->DrawString(gcnew String(p->myName.c_str()), 
 				gcnew System::Drawing::Font( "Arial",16 ),
-				gcnew SolidBrush( Color::Black ),p->x,p->y);
+				gcnew SolidBrush( Color::Black ),(float)p->x,(float)p->y);
 		 }
 
 		 void DrawEdge(  Graphics^ g, int va, int vb )

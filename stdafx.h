@@ -9,3 +9,4 @@
 
 #include <algorithm>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/circle_layout.hpp>

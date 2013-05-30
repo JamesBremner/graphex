@@ -17,7 +17,9 @@ class cEdge
 {
 	int a;
 	int b;
-	public:
+public:
+
+	cEdge() {}
 	cEdge( int A, int B )
 		: a( A ), b( B )
 	{}
@@ -25,30 +27,24 @@ class cEdge
 	{ return a == other.a && b == other.b; }
 };
 
+enum vertex_position_t { vertex_position = 502 };
+namespace boost { 
+   BOOST_INSTALL_PROPERTY(vertex, position); 
+} 
+/*struct point 
+{ 
+   double x; 
+   double y; 
+};*/ 
+
 class cGraph
 {
 public:
 	typedef std::vector< cVertex >::iterator vertex_iter_t;
-	typedef std::vector< cEdge >::iterator edge_iter_t;
-	void AddVertex()
-	{
-		myVertex.push_back( cVertex() );
-	}
+	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
-	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, bgl ); }
-	void Arrange()
-	{
-		int k = 0;
-			for( vertex_iter_t p = beginVertex();
-				p != endVertex(); p++ )
-			{
-				int x = ( k % 3 ) * 50;
-				int y = ( k / 3 ) * 100;
-				p->setXY(x,y);
-				k++;
-			}
-
-	}
+	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
+	void Arrange();
 	void NameVertex( int i,  System::String^ n )
 	{
 		if( 0 > i || i >= (int)myVertex.size() )
@@ -63,12 +59,20 @@ public:
 	bool nextEdge( int& a, int& b );
 
 private:
-	typedef boost::adjacency_list<> graph_t;
+	typedef boost::square_topology<>::point_type point;
+ 	typedef boost::adjacency_list <
+		boost::listS, boost::vecS, boost::bidirectionalS,
+		// Vertex properties
+		boost::property<
+			boost::vertex_index_t, int,
+			boost::property<vertex_position_t, point> >
+	> graph_t;
+	graph_t myGraph;
 
 	std::vector< cVertex > myVertex;
-	graph_t bgl;
 
 	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter;
 	edge_iter ei, ei_end;
+	typedef boost::graph_traits<graph_t>::vertex_iterator vertex_iter_bgl;
 
 };
