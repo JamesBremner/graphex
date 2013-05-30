@@ -13,6 +13,12 @@ namespace graphex {
 
 	cGraph theGraph;
 
+			 enum display_enum {
+				 none,
+				 graph,
+
+			 } ;
+
 	/// <summary>
 	/// Summary for Form1
 	///
@@ -55,6 +61,7 @@ namespace graphex {
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  Name;
 	private: System::Windows::Forms::Panel^  graphpanel;
 
+			display_enum  myCurDisplay;
 
 	protected: 
 
@@ -176,6 +183,7 @@ namespace graphex {
 			this->graphpanel->Name = L"graphpanel";
 			this->graphpanel->Size = System::Drawing::Size(149, 150);
 			this->graphpanel->TabIndex = 8;
+			this->graphpanel->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Form1::graphpanel_Paint);
 			// 
 			// Form1
 			// 
@@ -202,6 +210,7 @@ namespace graphex {
 
 		 void HideAll()
 		 {
+			 myCurDisplay = none;
 			VertexGridView->Hide();
 			EdgeGridView->Hide();
 			MatrixGridView->Hide();
@@ -277,29 +286,26 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 
 		 }
 
+		 /**
+
+		 User wants to see the graph layout
+
+		 */
 private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 // update the layout
 			 theGraph.Arrange();
+
+			 // display the graph panel
 			 HideAll();
+			 myCurDisplay = graph;
 			 graphpanel->Show();
 			 System::Drawing::Rectangle r = this->ClientRectangle;
 			 graphpanel->Location = System::Drawing::Point(130, 15);
 			 graphpanel->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
-			   Graphics^ g = graphpanel->CreateGraphics();
 
-			int a,b;
-			bool more_edges = theGraph.firstEdge( a, b );
-			while( more_edges ) {
-				DrawEdge( g, a, b );
-				more_edges = theGraph.nextEdge( a, b );
-			}
-
-			for( cGraph::vertex_iter_t p = theGraph.beginVertex();
-				p != theGraph.endVertex(); p++ )
-			{
-				DrawVertex( g, p );
-			}
-
-			delete g;
+			 // redraw it
+			 graphpanel->Invalidate();
 		 }
 private: System::Void MatrixGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
 			 if( MatrixGridView->Rows[e->RowIndex]->Cells[e->ColumnIndex]->Value == nullptr ) {
@@ -322,7 +328,29 @@ private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System
 				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() );
 		 }
 
+/**
 
+  Paint the graph layour panel
+
+*/
+private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
+
+			 if( myCurDisplay != graph ) {
+				 return;
+			 }
+			 int a,b;
+			 bool more_edges = theGraph.firstEdge( a, b );
+			 while( more_edges ) {
+				 DrawEdge( e->Graphics, a, b );
+				 more_edges = theGraph.nextEdge( a, b );
+			 }
+
+			 for( cGraph::vertex_iter_t p = theGraph.beginVertex();
+				 p != theGraph.endVertex(); p++ )
+			 {
+				 DrawVertex( e->Graphics, p );
+			 }
+		 }
 };
 }
 
