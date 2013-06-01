@@ -50,8 +50,7 @@ void cGraph::AddEdge( int row, int col, const std::wstring& name )
 
 void cGraph::AddVertex()
 { 
-	static int vertex_index = 1;
-	boost::add_vertex( vertex_index++, myGraph );
+	boost::add_vertex(  myGraph );
 }
 /**
 
@@ -60,18 +59,7 @@ void cGraph::AddVertex()
 */
 void cGraph::Arrange()
 {
-
-	boost::property_map<graph_t, vertex_position_t>::type
-		position = get(vertex_position, myGraph);
-
-	boost::circle_graph_layout( myGraph,  position, 100.0);
-
-	vertex_iter_t vi, vi_end;
-	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
-		int x = (int)position[*vi][0];
-		int y = (int)position[*vi][1];
-		myGraph[*vi].setXY(x+200,y+200);
-	}
+	boost::circle_graph_layout( myGraph,  get(&cVertex::myPoint,myGraph), 100.0);
 }
 /**
 
@@ -107,14 +95,13 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 		a=source(*ei,myGraph);
 		b=target(*ei,myGraph);
 		g->DrawLine( gcnew Pen(Color::Black, 3),
-				 myGraph[v0+a].x, myGraph[v0+a].y,
-				 myGraph[v0+b].x, myGraph[v0+b].y );
+				 myGraph[v0+a].getScreenX(), myGraph[v0+a].getScreenY(),
+				 myGraph[v0+b].getScreenX(), myGraph[v0+b].getScreenY() );
 	}
 
 	// Draw the vertices
 	vertex_iter_t vi, vi_end;
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
-	
 		myGraph[*vi].Draw( g );
 	}
 
@@ -139,6 +126,9 @@ void cVertex::Draw( System::Drawing::Graphics^ g  )
 		case 2: brush->Color = Color::Blue; break;
 		case 3: brush->Color = Color::Yellow; break;
 	}
+
+	int x = getScreenX();
+	int y = getScreenY();
 	g->FillRectangle( brush,
 		x-box_size/2,y-box_size/2,box_size,box_size);
 

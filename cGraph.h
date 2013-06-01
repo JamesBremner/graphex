@@ -7,12 +7,15 @@ public:
 	}
 	void setXY( int X, int Y )	{ x = X, y = Y; }
 	void Draw( System::Drawing::Graphics^ g );
+	int getScreenX()			{  return (int)myPoint[0]+200; }
+	int getScreenY()			{  return (int)myPoint[1]+200; }
 
 
 	std::wstring myName;
 	int x;
 	int y;
 	int myColor;
+	boost::square_topology<>::point_type myPoint;
 };
 
 class cEdge
@@ -50,22 +53,16 @@ public:
 	int getVertexCount()			{ return boost::num_vertices( myGraph); }
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
-	bool getEdge( int& iva, int& ivb, int ei );
+	bool getEdge( int& iva, int& iv, int ei );
 
 	void DrawLayout( System::Drawing::Graphics^ g );
 
 private:
 
 	// The BGL graph
-
-	typedef boost::square_topology<>::point_type point;
-	typedef boost::property< boost::vertex_index_t, int,
-			boost::property< vertex_position_t, point,
-			cVertex > >
-				vertex_props_t;
  	typedef boost::adjacency_list <
 		boost::listS, boost::vecS, boost::bidirectionalS,
-		vertex_props_t >
+		cVertex  >
 				graph_t;
 	graph_t myGraph;
 
