@@ -20,13 +20,25 @@ bool cGraph::nextEdge( int& a, int& b )
 	return true;
 
 }
-cGraph::vertex_iter_t cGraph::getVertex( int i )
+void cGraph::setNameVertex( int i,  System::String^ n )
 {
-	if( 0 > i || i >= (int)myVertex.size() ) {
-		return myVertex.end();
-	}
-	return myVertex.begin() + i;
+	if( 0 > i || i >= getVertexCount() )
+		return;
+	graph_t::vertex_descriptor v = *vertices(myGraph).first;
+	myGraph[v+i].myName =  msclr::interop::marshal_as<std::wstring>( n );
 }
+const std::wstring& cGraph::getNameVertex( int i )
+{
+	if( 0 > i || i >= getVertexCount() ) {
+		static std::wstring nullstr(L"");
+		return nullstr;
+	}
+	graph_t::vertex_descriptor v = *vertices(myGraph).first;
+	return myGraph[v+i].myName;
+
+}
+
+
 void cGraph::AddEdge( int row, int col, const std::wstring& name )
 {
 	boost::add_edge( row, col, myGraph );
@@ -34,7 +46,6 @@ void cGraph::AddEdge( int row, int col, const std::wstring& name )
 
 void cGraph::AddVertex()
 { 
-	myVertex.push_back( cVertex() );
 	static int vertex_index = 1;
 	boost::add_vertex( vertex_index++, myGraph );
 }
@@ -51,13 +62,11 @@ void cGraph::Arrange()
 
 	boost::circle_graph_layout( myGraph,  position, 100.0);
 
-	vertex_iter_t p = beginVertex();
 	vertex_iter_bgl vi, vi_end;
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
 		int x = (int)position[*vi][0];
 		int y = (int)position[*vi][1];
-		p->setXY(x+200,y+200);
-		p++;
+		myGraph[*vi].setXY(x+200,y+200);
 	}
 }
 /**
@@ -88,24 +97,21 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 
 	*/
 	int a,b;
+	graph_t::vertex_descriptor v0 = *vertices(myGraph).first;
 	edge_iter ei, ei_end;
 	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
 		a=source(*ei,myGraph);
 		b=target(*ei,myGraph);
 		g->DrawLine( gcnew Pen(Color::Black, 3),
-				 myVertex[a].x, myVertex[a].y,
-				 myVertex[b].x, myVertex[b].y );
+				 myGraph[v0+a].x, myGraph[v0+a].y,
+				 myGraph[v0+b].x, myGraph[v0+b].y );
 	}
 
 	// Draw the vertices
 	boost::property_map<graph_t, boost::vertex_color_t>::type
 		colorMap = get(boost::vertex_color,myGraph);
-	int kv = 0;
-	for( vertex_iter_t p = myVertex.begin();
-		p != myVertex.end(); p++ )
-	{
-		p->Draw( g, colorMap[kv] );
-		kv++;
+	for( int kv = 0; kv < getVertexCount(); kv++ ) {
+		myGraph[v0+kv].Draw( g, colorMap[kv] );
 	}
 
 }

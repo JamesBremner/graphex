@@ -245,14 +245,20 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 			 // Add row and column for each vertex
 			MatrixGridView->RowCount = theGraph.getVertexCount();
 			MatrixGridView->ColumnCount = theGraph.getVertexCount();
-			int k = 0;
-			for( cGraph::vertex_iter_t p = theGraph.beginVertex();
-				p != theGraph.endVertex(); p++ )
+			for( int kv = 0; kv < theGraph.getVertexCount(); kv++ )
 			{
-				MatrixGridView->Columns[k]->HeaderText = gcnew String( p->myName.c_str() );
-				MatrixGridView->Rows[k]->HeaderCell->Value = gcnew String( p->myName.c_str() );
-				k++;
+				MatrixGridView->Columns[kv]->HeaderText = gcnew String( theGraph.getNameVertex( kv ).c_str() );
+				MatrixGridView->Rows[kv]->HeaderCell->Value = gcnew String( theGraph.getNameVertex( kv ).c_str() );
 			}
+
+			//int k = 0;
+			//for( cGraph::vertex_iter_t p = theGraph.beginVertex();
+			//	p != theGraph.endVertex(); p++ )
+			//{
+			//	MatrixGridView->Columns[k]->HeaderText = gcnew String( p->myName.c_str() );
+			//	MatrixGridView->Rows[k]->HeaderCell->Value = gcnew String( p->myName.c_str() );
+			//	k++;
+			//}
 
 			int a,b;
 			bool more_edges = theGraph.firstEdge( a, b );
@@ -316,7 +322,7 @@ private: System::Void VertexGridView_UserAddedRow(System::Object^  sender, Syste
 		 }
 private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
 
-			 theGraph.NameVertex(
+			 theGraph.setNameVertex(
 				 e->RowIndex,
 				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() );
 		 }

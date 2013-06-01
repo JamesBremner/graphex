@@ -42,7 +42,6 @@ namespace boost {
 class cGraph
 {
 public:
-	typedef std::vector< cVertex >::iterator vertex_iter_t;
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
@@ -50,16 +49,9 @@ public:
 	void Arrange();
 	void MapColor();
 
-	void NameVertex( int i,  System::String^ n )
-	{
-		if( 0 > i || i >= (int)myVertex.size() )
-			return;
-		myVertex[ i ].setName(  msclr::interop::marshal_as<std::wstring>( n ) );
-	}
-	int getVertexCount()			{ return myVertex.size(); }
-	vertex_iter_t beginVertex()		{ return myVertex.begin(); }
-	vertex_iter_t endVertex()		{ return myVertex.end(); }
-	vertex_iter_t  getVertex( int i );
+	void setNameVertex( int i,  System::String^ n );
+	const std::wstring& getNameVertex( int i );
+	int getVertexCount()			{ return boost::num_vertices( myGraph); }
 	bool firstEdge( int& a, int& b );
 	bool nextEdge( int& a, int& b );
 	void DrawLayout( System::Drawing::Graphics^ g );
@@ -71,15 +63,14 @@ private:
 	typedef boost::square_topology<>::point_type point;
 	typedef boost::property< boost::vertex_index_t, int,
 			boost::property< vertex_position_t, point,
-			boost::property< boost::vertex_color_t, int > > >
+			boost::property< boost::vertex_color_t, int,
+			cVertex > > >
 				vertex_props_t;
  	typedef boost::adjacency_list <
 		boost::listS, boost::vecS, boost::bidirectionalS,
 		vertex_props_t >
 				graph_t;
 	graph_t myGraph;
-
-	std::vector< cVertex > myVertex;
 
 	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter;
 	edge_iter ei, ei_end;
