@@ -52,8 +52,10 @@ public:
 	void setNameVertex( int i,  System::String^ n );
 	const std::wstring& getNameVertex( int i );
 	int getVertexCount()			{ return boost::num_vertices( myGraph); }
-	bool firstEdge( int& a, int& b );
-	bool nextEdge( int& a, int& b );
+
+	int getEdgeCount()				{ return boost::num_edges( myGraph); }
+	bool getEdge( int& iva, int& ivb, int ei );
+
 	void DrawLayout( System::Drawing::Graphics^ g );
 
 private:
@@ -73,7 +75,6 @@ private:
 	graph_t myGraph;
 
 	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter;
-	edge_iter ei, ei_end;
 	typedef boost::graph_traits<graph_t>::vertex_iterator vertex_iter_bgl;
 
 };

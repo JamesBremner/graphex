@@ -251,20 +251,11 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 				MatrixGridView->Rows[kv]->HeaderCell->Value = gcnew String( theGraph.getNameVertex( kv ).c_str() );
 			}
 
-			//int k = 0;
-			//for( cGraph::vertex_iter_t p = theGraph.beginVertex();
-			//	p != theGraph.endVertex(); p++ )
-			//{
-			//	MatrixGridView->Columns[k]->HeaderText = gcnew String( p->myName.c_str() );
-			//	MatrixGridView->Rows[k]->HeaderCell->Value = gcnew String( p->myName.c_str() );
-			//	k++;
-			//}
 
 			int a,b;
-			bool more_edges = theGraph.firstEdge( a, b );
-			while( more_edges ) {
+			for( int ke = 0; ke < theGraph.getEdgeCount(); ke++ ) {
+				theGraph.getEdge( a, b, ke );
 				MatrixGridView->Rows[a]->Cells[b]->Value = L"1";
-				more_edges = theGraph.nextEdge( a, b );
 			}
 
 		 }

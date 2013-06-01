@@ -1,23 +1,27 @@
 #include "stdafx.h"
 #include "cGraph.h"
 
-bool cGraph::firstEdge( int& a, int& b )
+/**
+
+  get edge
+
+  @param[in] idx Index of edge in graph
+  @param[out] a index of 1st vertex
+  @param[out] b index of second edge
+
+  @return true if edge found
+
+*/
+bool cGraph::getEdge( int& iva, int& ivb, int idx )
 {
-	tie(ei, ei_end) = edges( myGraph );
-	if( ei == ei_end )
+	if( 0 > idx || idx >= getEdgeCount() )
 		return false;
-    a=source(*ei,myGraph);
-    b=target(*ei,myGraph);
+	graph_t::edge_descriptor e = *edges(myGraph).first;
+	iva = source( e, myGraph );
+	ivb = target( e, myGraph );
+
 	return true;
-}
-bool cGraph::nextEdge( int& a, int& b )
-{
-	ei++;
-	if( ei == ei_end )
-		return false;
-    a=source(*ei,myGraph);
-    b=target(*ei,myGraph);
-	return true;
+
 
 }
 void cGraph::setNameVertex( int i,  System::String^ n )
