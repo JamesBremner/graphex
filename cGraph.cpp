@@ -66,7 +66,7 @@ void cGraph::Arrange()
 
 	boost::circle_graph_layout( myGraph,  position, 100.0);
 
-	vertex_iter_bgl vi, vi_end;
+	vertex_iter_t vi, vi_end;
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
 		int x = (int)position[*vi][0];
 		int y = (int)position[*vi][1];
@@ -82,7 +82,7 @@ void cGraph::MapColor()
 {
 	boost::sequential_vertex_coloring(
 		myGraph,
-		get(boost::vertex_color,myGraph) );
+		get(&cVertex::myColor,myGraph) );
 }
 /**
 
@@ -102,7 +102,7 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 	*/
 	int a,b;
 	graph_t::vertex_descriptor v0 = *vertices(myGraph).first;
-	edge_iter ei, ei_end;
+	edge_iter_t ei, ei_end;
 	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
 		a=source(*ei,myGraph);
 		b=target(*ei,myGraph);
@@ -112,10 +112,10 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 	}
 
 	// Draw the vertices
-	boost::property_map<graph_t, boost::vertex_color_t>::type
-		colorMap = get(boost::vertex_color,myGraph);
-	for( int kv = 0; kv < getVertexCount(); kv++ ) {
-		myGraph[v0+kv].Draw( g, colorMap[kv] );
+	vertex_iter_t vi, vi_end;
+	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
+	
+		myGraph[*vi].Draw( g );
 	}
 
 }
@@ -124,17 +124,16 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
   Draw vertex on screen
 
   @param[in] g The graphics context of the window where the drawing is reuired
-  @param[in] coloridx  The index of the color to be used
 
 */
-void cVertex::Draw( System::Drawing::Graphics^ g, int coloridx )
+void cVertex::Draw( System::Drawing::Graphics^ g  )
 {
 	using namespace System::Drawing;
 
 	// Represent vertex with a box of specified color
 	const int box_size = 30;
 	SolidBrush^ brush = gcnew SolidBrush(Color::Black);
-	switch( coloridx ) {
+	switch( myColor ) {
 		case 0: brush->Color = Color::LightGreen; break;
 		case 1: brush->Color = Color::Red; break;
 		case 2: brush->Color = Color::Blue; break;

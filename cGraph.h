@@ -6,13 +6,13 @@ public:
 		myName = n;
 	}
 	void setXY( int X, int Y )	{ x = X, y = Y; }
-	void Draw( System::Drawing::Graphics^ g,
-		int coloridx );
+	void Draw( System::Drawing::Graphics^ g );
 
 
 	std::wstring myName;
 	int x;
 	int y;
+	int myColor;
 };
 
 class cEdge
@@ -33,11 +33,7 @@ enum vertex_position_t { vertex_position = 502 };
 namespace boost { 
    BOOST_INSTALL_PROPERTY(vertex, position); 
 } 
-/*struct point 
-{ 
-   double x; 
-   double y; 
-};*/ 
+
 
 class cGraph
 {
@@ -65,8 +61,7 @@ private:
 	typedef boost::square_topology<>::point_type point;
 	typedef boost::property< boost::vertex_index_t, int,
 			boost::property< vertex_position_t, point,
-			boost::property< boost::vertex_color_t, int,
-			cVertex > > >
+			cVertex > >
 				vertex_props_t;
  	typedef boost::adjacency_list <
 		boost::listS, boost::vecS, boost::bidirectionalS,
@@ -74,7 +69,7 @@ private:
 				graph_t;
 	graph_t myGraph;
 
-	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter;
-	typedef boost::graph_traits<graph_t>::vertex_iterator vertex_iter_bgl;
+	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter_t;
+	typedef boost::graph_traits<graph_t>::vertex_iterator vertex_iter_t;
 
 };
