@@ -65,20 +65,21 @@ public:
 	void DrawLayout( System::Drawing::Graphics^ g );
 
 private:
+
+	// The BGL graph
+
 	typedef boost::square_topology<>::point_type point;
 	typedef boost::property< boost::vertex_index_t, int,
 			boost::property< vertex_position_t, point,
-			boost::property< boost::vertex_color_t, float > > >
+			boost::property< boost::vertex_color_t, int > > >
 				vertex_props_t;
  	typedef boost::adjacency_list <
 		boost::listS, boost::vecS, boost::bidirectionalS,
 		vertex_props_t >
 				graph_t;
-
 	graph_t myGraph;
 
 	std::vector< cVertex > myVertex;
-	std::vector<unsigned int> myColorMap;
 
 	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter;
 	edge_iter ei, ei_end;

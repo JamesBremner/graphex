@@ -288,14 +288,27 @@ private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs
 			 graphpanel->Invalidate();
 		 }
 private: System::Void MatrixGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
-			 if( MatrixGridView->Rows[e->RowIndex]->Cells[e->ColumnIndex]->Value == nullptr ) {
-				 theGraph.RemoveEdge( e->RowIndex,e->ColumnIndex );
-			 } else {
-				 theGraph.AddEdge(
-					 e->RowIndex,e->ColumnIndex,
-					 msclr::interop::marshal_as<std::wstring>( 
-						MatrixGridView->Rows[e->RowIndex]->Cells[e->ColumnIndex]->Value->ToString() ) );
+
+			 if( e->RowIndex == e->ColumnIndex ) {
+				 // Cell edited was on the leading diagonal
+				 // It is meaningless to connect a vertex to itself
+				 // So just ignore this
+				 return;
 			 }
+
+			 if( MatrixGridView->Rows[e->RowIndex]->Cells[e->ColumnIndex]->Value == nullptr ) {
+				 // The edited cell contains nothing
+				 // Delete any relationship
+				 theGraph.RemoveEdge( e->RowIndex,e->ColumnIndex );
+				 return;
+			 }
+
+			 // Add the relationship
+			 theGraph.AddEdge(
+				 e->RowIndex,e->ColumnIndex,
+				 msclr::interop::marshal_as<std::wstring>( 
+				 MatrixGridView->Rows[e->RowIndex]->Cells[e->ColumnIndex]->Value->ToString() ) );
+
 		 }
 private: System::Void VertexGridView_UserAddedRow(System::Object^  sender, System::Windows::Forms::DataGridViewRowEventArgs^  e) {
 

@@ -67,18 +67,9 @@ void cGraph::Arrange()
 */
 void cGraph::MapColor()
 {
-	// set size of color map to number of vertices in graph
-	myColorMap.resize(num_vertices(myGraph));
-
-	// adapt color_map vector so it can be used by sequential_vertex_coloring
-	typedef boost::property_map<graph_t, boost::vertex_index_t>::const_type vertex_index_map;
-	boost::iterator_property_map<std::vector<unsigned int>::iterator, vertex_index_map>
-		color(myColorMap.begin(), get(boost::vertex_index, myGraph));
-
-	// assign colors to vertices
-	int num_colors = boost::sequential_vertex_coloring(myGraph, color );
-
-
+	boost::sequential_vertex_coloring(
+		myGraph,
+		get(boost::vertex_color,myGraph) );
 }
 /**
 
@@ -107,11 +98,13 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 	}
 
 	// Draw the vertices
+	boost::property_map<graph_t, boost::vertex_color_t>::type
+		colorMap = get(boost::vertex_color,myGraph);
 	int kv = 0;
 	for( vertex_iter_t p = myVertex.begin();
 		p != myVertex.end(); p++ )
 	{
-		p->Draw( g, myColorMap[kv] );
+		p->Draw( g, colorMap[kv] );
 		kv++;
 	}
 
