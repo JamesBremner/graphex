@@ -7,8 +7,11 @@ public:
 	}
 	void setXY( int X, int Y )	{ x = X, y = Y; }
 	void Draw( System::Drawing::Graphics^ g );
+	void DrawAsSelected( System::Drawing::Graphics^ g );
 	int getScreenX()			{  return (int)myPoint[0]+200; }
 	int getScreenY()			{  return (int)myPoint[1]+200; }
+	bool IsHit( int mx, int my );
+	void Move( int mx, int my );
 
 
 	std::wstring myName;
@@ -36,6 +39,9 @@ public:
 class cGraph
 {
 public:
+	cGraph()
+		: myVertexBoxSize( 30 )
+	{}
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
@@ -51,8 +57,13 @@ public:
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );
+	int getVertexBoxSize()			{ return myVertexBoxSize; }
 
 	void DrawLayout( System::Drawing::Graphics^ g );
+
+	void MouseClick( int x, int y );
+	bool IsSelectedVertex();
+	void setLocationSelectedVertex( int mx, int my );
 
 private:
 
@@ -66,4 +77,9 @@ private:
 	typedef boost::graph_traits<graph_t>::edge_iterator edge_iter_t;
 	typedef boost::graph_traits<graph_t>::vertex_iterator vertex_iter_t;
 
+	int myVertexBoxSize;
+	vertex_iter_t mySelectedVertex;
+
 };
+
+extern 	cGraph theGraph;

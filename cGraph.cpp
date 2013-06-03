@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "cGraph.h"
 
+cGraph theGraph;
+
 /**
 
   get edge
@@ -66,6 +68,59 @@ bool cGraph::FindVertex( const std::wstring& n )
 	return false;
 	
 }	
+/**
+
+  Mouse click
+
+  @param[in] x location of mouse on screen
+  @param[in] y location of mouse on screen
+
+  If the mouse click is inside the box representing a vertex,
+  the vertex becomes selected
+
+  */
+
+void cGraph::MouseClick( int x, int y )
+{
+	vertex_iter_t vi, vi_end;
+	tie(vi, vi_end) = vertices(myGraph);
+	mySelectedVertex = vi_end;
+	for ( ; vi != vi_end; ++vi) {
+		if( myGraph[*vi].IsHit( x, y ) ) {
+			mySelectedVertex = vi;
+			break;
+		}
+	}
+}
+/**
+
+  Is there a selected vertex
+
+  @return true if selected vertex exists
+
+*/
+bool cGraph::IsSelectedVertex()
+{
+	vertex_iter_t vi, vi_end;
+	tie(vi, vi_end) = vertices(myGraph);
+	return mySelectedVertex != vi_end;
+}
+/**
+
+  Move the selected vertex
+
+  @param[in] mx new x location in screen co-ords
+  @param[in] my new y location in screen co-ords
+
+*/
+void cGraph::setLocationSelectedVertex( int mx, int my )
+{
+	if( ! IsSelectedVertex() )
+		return;
+	myGraph[ *mySelectedVertex ].Move(mx,my);
+}
+
+
 const std::wstring& cGraph::getNameVertex( int i )
 {
 	if( 0 > i || i >= getVertexCount() ) {
@@ -140,6 +195,11 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 		myGraph[*vi].Draw( g );
 	}
 
+	// Highlight selected vertex
+	if( mySelectedVertex != vi_end ) {
+		myGraph[ * mySelectedVertex ].DrawAsSelected( g );
+	}
+
 }
 /**
 
@@ -153,7 +213,7 @@ void cVertex::Draw( System::Drawing::Graphics^ g  )
 	using namespace System::Drawing;
 
 	// Represent vertex with a box of specified color
-	const int box_size = 30;
+	const int box_size = theGraph.getVertexBoxSize();
 	SolidBrush^ brush = gcnew SolidBrush(Color::Black);
 	switch( myColor ) {
 		case 0: brush->Color = Color::LightGreen; break;
@@ -172,4 +232,52 @@ void cVertex::Draw( System::Drawing::Graphics^ g  )
 		gcnew Font( "Arial",16 ),
 		gcnew SolidBrush( Color::Black ),
 		(float)x-box_size/2,(float)y-box_size/2);
+}
+/**
+
+  Highlight vertex
+
+*/
+void cVertex::DrawAsSelected( System::Drawing::Graphics^ g )
+{
+	using namespace System::Drawing;
+	const int box_size = theGraph.getVertexBoxSize();
+	int x = getScreenX();
+	int y = getScreenY();
+	g->DrawRectangle( gcnew Pen( Color::Black,3.0f ),
+		x-box_size/2,y-box_size/2,box_size,box_size);
+
+}
+/**
+
+  Is this vertex hit
+
+  @param[in] mx  x location in screen co-ords
+  @param[in] my  y location in screen co-ords
+
+  @return true if location inside box representing vertex
+
+*/
+bool cVertex::IsHit( int mx, int my)
+{
+	int x = getScreenX();
+	int y = getScreenY();
+	int size = theGraph.getVertexBoxSize()/2;
+	return ( x-size <= mx &&
+		mx <= x+ size &&
+		y-size <= my &&
+		my <= y+size );
+}
+/**
+
+  Move the vertex
+
+  @param[in] mx  x location in screen co-ords
+  @param[in] my  y location in screen co-ords
+
+*/
+void cVertex::Move( int mx, int my )
+{
+	myPoint[0] = mx-200;
+	myPoint[1] = my-200;
 }

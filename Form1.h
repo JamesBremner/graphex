@@ -11,7 +11,7 @@ namespace graphex {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	cGraph theGraph;
+
 
 			 enum display_enum {
 				 none,
@@ -32,6 +32,7 @@ namespace graphex {
 	{
 	public:
 		Form1(void)
+			: flagVertexDragging( false )
 		{
 			InitializeComponent();
 			//
@@ -62,6 +63,7 @@ namespace graphex {
 	private: System::Windows::Forms::Panel^  graphpanel;
 
 			display_enum  myCurDisplay;
+			bool flagVertexDragging;
 
 	protected: 
 
@@ -185,6 +187,10 @@ namespace graphex {
 			this->graphpanel->Size = System::Drawing::Size(149, 150);
 			this->graphpanel->TabIndex = 8;
 			this->graphpanel->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Form1::graphpanel_Paint);
+			this->graphpanel->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &Form1::graphpanel_MouseMove);
+			this->graphpanel->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &Form1::graphpanel_MouseClick);
+			this->graphpanel->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &Form1::graphpanel_MouseDown);
+			this->graphpanel->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &Form1::graphpanel_MouseUp);
 			// 
 			// Form1
 			// 
@@ -357,6 +363,23 @@ private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows:
 		 }
 private: System::Void VertexGridView_RowsRemoved(System::Object^  sender, System::Windows::Forms::DataGridViewRowsRemovedEventArgs^  e) {
 			 theGraph.RemoveVertex(e->RowIndex);
+		 }
+private: System::Void graphpanel_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+		 }
+private: System::Void graphpanel_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+			 theGraph.MouseClick(e->X,e->Y);
+			 graphpanel->Invalidate();
+			 flagVertexDragging = theGraph.IsSelectedVertex();
+
+		 }
+private: System::Void graphpanel_MouseUp(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+			 flagVertexDragging = false;
+		 }
+private: System::Void graphpanel_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+			 if( ! flagVertexDragging )
+				 return;
+			 theGraph.setLocationSelectedVertex( e->X,e->Y);
+			 graphpanel->Invalidate();
 		 }
 };
 }
