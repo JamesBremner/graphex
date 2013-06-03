@@ -39,6 +39,7 @@ public:
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
+	void RemoveVertex( int i )			{ boost::remove_vertex( i, myGraph ); }
 
 	void Arrange();
 	void MapColor();

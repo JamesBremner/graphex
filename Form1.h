@@ -152,6 +152,7 @@ namespace graphex {
 			this->VertexGridView->TabIndex = 5;
 			this->VertexGridView->UserAddedRow += gcnew System::Windows::Forms::DataGridViewRowEventHandler(this, &Form1::VertexGridView_UserAddedRow);
 			this->VertexGridView->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &Form1::VertexGridView_CellEndEdit);
+			this->VertexGridView->RowsRemoved += gcnew System::Windows::Forms::DataGridViewRowsRemovedEventHandler(this, &Form1::VertexGridView_RowsRemoved);
 			// 
 			// Name
 			// 
@@ -353,6 +354,9 @@ private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows:
 			 }
 			 theGraph.DrawLayout( e->Graphics );
 
+		 }
+private: System::Void VertexGridView_RowsRemoved(System::Object^  sender, System::Windows::Forms::DataGridViewRowsRemovedEventArgs^  e) {
+			 theGraph.RemoveVertex(e->RowIndex);
 		 }
 };
 }
