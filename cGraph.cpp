@@ -24,13 +24,48 @@ bool cGraph::getEdge( int& iva, int& ivb, int idx )
 
 
 }
-void cGraph::setNameVertex( int i,  System::String^ n )
+/**
+
+  Change the name of a vertex
+
+  @param[in] i index number of vertex to be changed
+  @param[in] n the new name
+
+  @return 0 success
+  @return 1 name already exists, no change made
+  @return 2 index out of range, no change made
+
+*/
+int cGraph::setNameVertex( int i,  System::String^ n )
 {
 	if( 0 > i || i >= getVertexCount() )
-		return;
+		return 2;
+	if( FindVertex(  msclr::interop::marshal_as<std::wstring>( n ) ) )
+		return 1;
 	graph_t::vertex_descriptor v = *vertices(myGraph).first;
 	myGraph[v+i].myName =  msclr::interop::marshal_as<std::wstring>( n );
+	return 0;
 }
+/**
+
+  Check if vertex name already exists in graph
+
+  @param[in] n name to check
+
+  @return true vertex with this name already exists
+  @return false no vertex with this name
+
+  */
+bool cGraph::FindVertex( const std::wstring& n )
+{
+	vertex_iter_t vi, vi_end;
+	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
+		if( myGraph[*vi].myName == n )
+			return true;
+	}
+	return false;
+	
+}	
 const std::wstring& cGraph::getNameVertex( int i )
 {
 	if( 0 > i || i >= getVertexCount() ) {

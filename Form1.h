@@ -311,16 +311,39 @@ private: System::Void VertexGridView_UserAddedRow(System::Object^  sender, Syste
 
 			 theGraph.AddVertex();
 		 }
+		 /**
+
+		 User has completed editing a vertex name
+
+		 */
 private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
 
-			 theGraph.setNameVertex(
+			 if( VertexGridView->Rows[e->RowIndex]->Cells[0]->Value == nullptr ) {
+				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = "___Deleted";
+			 }
+			 int error = theGraph.setNameVertex(
 				 e->RowIndex,
 				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() );
+			 if( error ) {
+				 // error returned from trying to set the vertex name
+				 // probably there is already a vertex with this name
+				 // get the previous name, before user attempted to change it
+				 String^ old_name = gcnew String( theGraph.getNameVertex( e->RowIndex ).c_str() );
+				 if( ! old_name->Length ) {
+					 // there was no previous name
+					 // assign one that is likely to be unique
+					 old_name = L"_new_vertex_" + e->RowIndex.ToString();
+					 theGraph.setNameVertex( e->RowIndex, old_name );
+				 }
+				 // reset name to unique value
+				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = old_name;
+			 }
+
 		 }
 
-/**
+		 /**
 
-  Paint the graph layout panel
+		 Paint the graph layout panel
 
 */
 private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {

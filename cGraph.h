@@ -32,11 +32,6 @@ public:
 	{ return a == other.a && b == other.b; }
 };
 
-enum vertex_position_t { vertex_position = 502 };
-namespace boost { 
-   BOOST_INSTALL_PROPERTY(vertex, position); 
-} 
-
 
 class cGraph
 {
@@ -48,9 +43,10 @@ public:
 	void Arrange();
 	void MapColor();
 
-	void setNameVertex( int i,  System::String^ n );
+	int setNameVertex( int i,  System::String^ n );
 	const std::wstring& getNameVertex( int i );
 	int getVertexCount()			{ return boost::num_vertices( myGraph); }
+	bool FindVertex( const std::wstring& n );
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );
