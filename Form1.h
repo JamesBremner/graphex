@@ -17,6 +17,7 @@ namespace graphex {
 		Manual,
 		//[Description("Auomatically place vertices in a circle")]
 		Circle,
+		Spring,
 	};
 
 public ref class MyEnumConverter : public EnumConverter
@@ -324,8 +325,17 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs^  e) {
 
 			 // update the layout
-			 if( *(theOptions->myLayout) != eLayout::Manual )
-				theGraph.Arrange();
+			 switch( *(theOptions->myLayout) ) {
+				 case eLayout::Manual:
+				 default:
+					 break;
+				 case eLayout::Circle:
+					theGraph.ArrangeCircle();
+					break;
+				 case eLayout::Spring:
+					 theGraph.ArrangeKK();
+					 break;
+			 }
 
 			 theGraph.MapColor();
 
@@ -439,6 +449,9 @@ private: System::Void graphpanel_MouseMove(System::Object^  sender, System::Wind
 				 return;
 			 theGraph.setLocationSelectedVertex( e->X,e->Y);
 			 graphpanel->Invalidate();
+
+			 // switch off auto arrangement of vertex location
+			 // so we don't lose the user's new location
 			 *(theOptions->myLayout) = eLayout::Manual; 
 		 }
 

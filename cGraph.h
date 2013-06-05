@@ -27,12 +27,18 @@ class cEdge
 	int b;
 public:
 
-	cEdge() {}
+	cEdge() 
+		:  myWeight(1.0)
+	{}
 	cEdge( int A, int B )
 		: a( A ), b( B )
+		, myWeight(1.0)
+
 	{}
 	bool operator ==( const cEdge& other ) const
 	{ return a == other.a && b == other.b; }
+
+	double myWeight;
 };
 
 
@@ -47,7 +53,8 @@ public:
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
 	void RemoveVertex( int i )			{ boost::remove_vertex( i, myGraph ); }
 
-	void Arrange();
+	void ArrangeCircle();
+	void ArrangeKK();
 	void MapColor();
 
 	int setNameVertex( int i,  System::String^ n );
@@ -69,8 +76,8 @@ private:
 
 	// The BGL graph
  	typedef boost::adjacency_list <
-		boost::listS, boost::vecS, boost::bidirectionalS,
-		cVertex  >
+		boost::vecS, boost::vecS, boost::undirectedS,
+		cVertex, cEdge  >
 				graph_t;
 	graph_t myGraph;
 

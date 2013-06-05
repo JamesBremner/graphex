@@ -147,9 +147,26 @@ void cGraph::AddVertex()
   Arrange the vertices in a circle
 
 */
-void cGraph::Arrange()
+void cGraph::ArrangeCircle()
 {
 	boost::circle_graph_layout( myGraph,  get(&cVertex::myPoint,myGraph), 100.0);
+}
+/**
+
+  Arrange the vertices according to their connections
+
+*/
+void cGraph::ArrangeKK()
+{
+	boost::circle_graph_layout( myGraph,
+		get(&cVertex::myPoint,myGraph), 100.0);
+
+
+	boost::kamada_kawai_spring_layout(myGraph, 
+		get(&cVertex::myPoint,myGraph),
+		get(&cEdge::myWeight, myGraph),
+		boost::square_topology<>(500.0),
+		boost::side_length(500.0));
 }
 /**
 
