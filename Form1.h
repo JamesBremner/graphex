@@ -12,10 +12,44 @@ namespace graphex {
 	using namespace System::Drawing;
 
 
+	public enum class eLayout {
+		//[Description("Move vertices by dragging with mouse")]
+		Manual,
+		//[Description("Auomatically place vertices in a circle")]
+		Circle,
+	};
+
+public ref class MyEnumConverter : public EnumConverter
+{
+public:
+	MyEnumConverter() : EnumConverter( eLayout::typeid ) {}
+};
+
+public ref class cOptions
+{
+public:
+		eLayout^ myLayout;
+public:
+
+	cOptions()
+		: myLayout(eLayout::Circle)
+	{}
+
+	[Category("Configuration")]
+	[Description("Location of vertices")]
+	[TypeConverter(MyEnumConverter::typeid)]
+	property eLayout^ Layout
+	{
+		eLayout^ get() { return myLayout; }
+		void set( eLayout^ value ) { myLayout = value; }
+	}
+
+};
 
 			 enum display_enum {
 				 none,
 				 graph,
+				 options,
 
 			 } ;
 
@@ -34,10 +68,9 @@ namespace graphex {
 		Form1(void)
 			: flagVertexDragging( false )
 		{
+			theOptions = gcnew cOptions();
 			InitializeComponent();
-			//
-			//TODO: Add the constructor code here
-			//
+			GraphPropertyGrid->SelectedObject = theOptions;
 		} 
 
 	protected:
@@ -63,7 +96,10 @@ namespace graphex {
 	private: System::Windows::Forms::Panel^  graphpanel;
 
 			display_enum  myCurDisplay;
+			cOptions^ theOptions;
 			bool flagVertexDragging;
+	private: System::Windows::Forms::PropertyGrid^  GraphPropertyGrid;
+
 
 	protected: 
 
@@ -90,6 +126,7 @@ namespace graphex {
 			this->EdgeGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->MatrixGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->graphpanel = (gcnew System::Windows::Forms::Panel());
+			this->GraphPropertyGrid = (gcnew System::Windows::Forms::PropertyGrid());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->MatrixGridView))->BeginInit();
@@ -142,6 +179,7 @@ namespace graphex {
 			this->btnOptions->TabIndex = 4;
 			this->btnOptions->Text = L"Options";
 			this->btnOptions->UseVisualStyleBackColor = true;
+			this->btnOptions->Click += gcnew System::EventHandler(this, &Form1::btnOptions_Click);
 			// 
 			// VertexGridView
 			// 
@@ -192,11 +230,19 @@ namespace graphex {
 			this->graphpanel->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &Form1::graphpanel_MouseDown);
 			this->graphpanel->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &Form1::graphpanel_MouseUp);
 			// 
+			// GraphPropertyGrid
+			// 
+			this->GraphPropertyGrid->Location = System::Drawing::Point(166, 192);
+			this->GraphPropertyGrid->Name = L"GraphPropertyGrid";
+			this->GraphPropertyGrid->Size = System::Drawing::Size(130, 130);
+			this->GraphPropertyGrid->TabIndex = 9;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(859, 567);
+			this->Controls->Add(this->GraphPropertyGrid);
 			this->Controls->Add(this->graphpanel);
 			this->Controls->Add(this->MatrixGridView);
 			this->Controls->Add(this->EdgeGridView);
@@ -206,6 +252,7 @@ namespace graphex {
 			this->Controls->Add(this->btnEdges);
 			this->Controls->Add(this->btnMatrix);
 			this->Controls->Add(this->btnVertices);
+
 			this->Text = L"Raven\'s Point Graph Explorer";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->EndInit();
@@ -222,6 +269,7 @@ namespace graphex {
 			EdgeGridView->Hide();
 			MatrixGridView->Hide();
 			graphpanel->Hide();
+			GraphPropertyGrid->Hide();
 		 }
 
 		/**
@@ -276,7 +324,8 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs^  e) {
 
 			 // update the layout
-			 theGraph.Arrange();
+			 if( *(theOptions->myLayout) != eLayout::Manual )
+				theGraph.Arrange();
 
 			 theGraph.MapColor();
 
@@ -291,6 +340,16 @@ private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs
 			 // redraw it
 			 graphpanel->Invalidate();
 		 }
+
+private: System::Void btnOptions_Click(System::Object^  sender, System::EventArgs^  e) {
+			 HideAll();
+			 myCurDisplay = options;
+			 GraphPropertyGrid->Show();
+			 System::Drawing::Rectangle r = this->ClientRectangle;
+			 GraphPropertyGrid->Location = System::Drawing::Point(130, 15);
+			 GraphPropertyGrid->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+		 }
+
 private: System::Void MatrixGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
 
 			 if( e->RowIndex == e->ColumnIndex ) {
@@ -380,7 +439,9 @@ private: System::Void graphpanel_MouseMove(System::Object^  sender, System::Wind
 				 return;
 			 theGraph.setLocationSelectedVertex( e->X,e->Y);
 			 graphpanel->Invalidate();
+			 *(theOptions->myLayout) = eLayout::Manual; 
 		 }
+
 };
 }
 
