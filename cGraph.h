@@ -1,11 +1,8 @@
 class cVertex
 {
 public:
-	void setName( const std::wstring& n )
-	{
-		myName = n;
-	}
-	void setXY( int X, int Y )	{ x = X, y = Y; }
+	void setName( const std::wstring& n ) {	myName = n; }
+	void setFixedLocation( double X, double Y )	{ myFixedX = X, myFixedY = Y; }
 	void Draw( System::Drawing::Graphics^ g );
 	void DrawAsSelected( System::Drawing::Graphics^ g );
 	int getScreenX()			{  return (int)myPoint[0]+200; }
@@ -15,10 +12,10 @@ public:
 
 
 	std::wstring myName;
-	int x;
-	int y;
 	int myColor;
 	boost::square_topology<>::point_type myPoint;
+	bool myFixedLocation;
+	double myFixedX, myFixedY;
 };
 
 class cEdge
@@ -61,6 +58,8 @@ public:
 	const std::wstring& getNameVertex( int i );
 	int getVertexCount()			{ return boost::num_vertices( myGraph); }
 	bool FindVertex( const std::wstring& n );
+	void setFreeLocation( int i );
+	void setFixedLocation( int i,  System::String^ sx, System::String^ sy );
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );

@@ -10,5 +10,7 @@
 #include <algorithm>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/circle_layout.hpp>
-#include <boost/graph/kamada_kawai_spring_layout.hpp>
+//#include <boost/graph/kamada_kawai_spring_layout.hpp>
 #include <boost/graph/sequential_vertex_coloring.hpp>
+
+#include "pin_kkspring_layout.hpp"

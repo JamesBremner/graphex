@@ -1,6 +1,8 @@
 #pragma once
 
+#include "cOptions.h"
 #include "cGraph.h"
+
 
 namespace graphex {
 
@@ -11,41 +13,6 @@ namespace graphex {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-
-	public enum class eLayout {
-		//[Description("Move vertices by dragging with mouse")]
-		Manual,
-		//[Description("Auomatically place vertices in a circle")]
-		Circle,
-		Spring,
-	};
-
-public ref class MyEnumConverter : public EnumConverter
-{
-public:
-	MyEnumConverter() : EnumConverter( eLayout::typeid ) {}
-};
-
-public ref class cOptions
-{
-public:
-		eLayout^ myLayout;
-public:
-
-	cOptions()
-		: myLayout(eLayout::Circle)
-	{}
-
-	[Category("Configuration")]
-	[Description("Location of vertices")]
-	[TypeConverter(MyEnumConverter::typeid)]
-	property eLayout^ Layout
-	{
-		eLayout^ get() { return myLayout; }
-		void set( eLayout^ value ) { myLayout = value; }
-	}
-
-};
 
 			 enum display_enum {
 				 none,
@@ -100,6 +67,8 @@ public:
 			cOptions^ theOptions;
 			bool flagVertexDragging;
 	private: System::Windows::Forms::PropertyGrid^  GraphPropertyGrid;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  FixedX;
+	private: System::Windows::Forms::DataGridViewTextBoxColumn^  FixedY;
 
 
 	protected: 
@@ -128,6 +97,8 @@ public:
 			this->MatrixGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->graphpanel = (gcnew System::Windows::Forms::Panel());
 			this->GraphPropertyGrid = (gcnew System::Windows::Forms::PropertyGrid());
+			this->FixedX = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->FixedY = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->MatrixGridView))->BeginInit();
@@ -186,7 +157,8 @@ public:
 			// 
 			this->VertexGridView->AllowUserToOrderColumns = true;
 			this->VertexGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->VertexGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(1) {this->Name});
+			this->VertexGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(3) {this->Name, 
+				this->FixedX, this->FixedY});
 			this->VertexGridView->Location = System::Drawing::Point(166, 13);
 			this->VertexGridView->Name = L"VertexGridView";
 			this->VertexGridView->Size = System::Drawing::Size(151, 150);
@@ -238,6 +210,16 @@ public:
 			this->GraphPropertyGrid->Size = System::Drawing::Size(130, 130);
 			this->GraphPropertyGrid->TabIndex = 9;
 			// 
+			// FixedX
+			// 
+			this->FixedX->HeaderText = L"FixedX";
+			this->FixedX->Name = L"FixedX";
+			// 
+			// FixedY
+			// 
+			this->FixedY->HeaderText = L"FixedY";
+			this->FixedY->Name = L"FixedY";
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -253,7 +235,6 @@ public:
 			this->Controls->Add(this->btnEdges);
 			this->Controls->Add(this->btnMatrix);
 			this->Controls->Add(this->btnVertices);
-
 			this->Text = L"Raven\'s Point Graph Explorer";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->EndInit();
@@ -389,30 +370,46 @@ private: System::Void VertexGridView_UserAddedRow(System::Object^  sender, Syste
 		 }
 		 /**
 
-		 User has completed editing a vertex name
+		 User has completed editing a vertex grid cell
 
 		 */
-private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e) {
+private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System::Windows::Forms::DataGridViewCellEventArgs^  e)
+		 {
 
-			 if( VertexGridView->Rows[e->RowIndex]->Cells[0]->Value == nullptr ) {
-				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = "___Deleted";
-			 }
-			 int error = theGraph.setNameVertex(
-				 e->RowIndex,
-				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() );
-			 if( error ) {
-				 // error returned from trying to set the vertex name
-				 // probably there is already a vertex with this name
-				 // get the previous name, before user attempted to change it
-				 String^ old_name = gcnew String( theGraph.getNameVertex( e->RowIndex ).c_str() );
-				 if( ! old_name->Length ) {
-					 // there was no previous name
-					 // assign one that is likely to be unique
-					 old_name = L"_new_vertex_" + e->RowIndex.ToString();
-					 theGraph.setNameVertex( e->RowIndex, old_name );
+			 if( e->ColumnIndex == 0 ) {
+				 // vertex name
+				 if( VertexGridView->Rows[e->RowIndex]->Cells[0]->Value == nullptr ) {
+					 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = "___Deleted";
 				 }
-				 // reset name to unique value
-				 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = old_name;
+				 int error = theGraph.setNameVertex(
+					 e->RowIndex,
+					 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() );
+				 if( error ) {
+					 // error returned from trying to set the vertex name
+					 // probably there is already a vertex with this name
+					 // get the previous name, before user attempted to change it
+					 String^ old_name = gcnew String( theGraph.getNameVertex( e->RowIndex ).c_str() );
+					 if( ! old_name->Length ) {
+						 // there was no previous name
+						 // assign one that is likely to be unique
+						 old_name = L"_new_vertex_" + e->RowIndex.ToString();
+						 theGraph.setNameVertex( e->RowIndex, old_name );
+					 }
+					 // reset name to unique value
+					 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = old_name;
+				 }
+			 } else {
+				 // fixed location
+				 if( VertexGridView->Rows[e->RowIndex]->Cells[1]->Value == nullptr &&
+					 VertexGridView->Rows[e->RowIndex]->Cells[2]->Value == nullptr ) {
+						 // free location
+						 theGraph.setFreeLocation( e->RowIndex );
+				 } else {
+					 theGraph.setFixedLocation( e->RowIndex,
+						 VertexGridView->Rows[e->RowIndex]->Cells[1]->Value->ToString(),
+						 VertexGridView->Rows[e->RowIndex]->Cells[2]->Value->ToString() );
+
+				 }
 			 }
 
 		 }

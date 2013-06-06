@@ -66,8 +66,26 @@ bool cGraph::FindVertex( const std::wstring& n )
 			return true;
 	}
 	return false;
-	
+
 }	
+void cGraph::setFreeLocation( int i )
+{
+	if( 0 > i || i >= getVertexCount() )
+		return;
+	graph_t::vertex_descriptor v = *vertices(myGraph).first;
+	myGraph[v+i].myFixedLocation = false;
+}
+void cGraph::setFixedLocation( int i,  System::String^ sx, System::String^ sy )
+{
+		if( 0 > i || i >= getVertexCount() )
+		return ;
+	graph_t::vertex_descriptor v = *vertices(myGraph).first;
+	myGraph[v+i].myFixedLocation = true;
+	myGraph[v+i].setFixedLocation( 
+		System::Convert::ToDouble(sx),
+		System::Convert::ToDouble(sy));
+}
+
 /**
 
   Mouse click
@@ -158,12 +176,20 @@ void cGraph::ArrangeCircle()
 */
 void cGraph::ArrangeKK()
 {
+
 	boost::circle_graph_layout( myGraph,
 		get(&cVertex::myPoint,myGraph), 100.0);
 
 
+	//boost::kamada_kawai_spring_layout(myGraph, 
+	//	get(&cVertex::myPoint,myGraph),
+	//	get(&cEdge::myWeight, myGraph),
+	//	boost::square_topology<>(500.0),
+	//	boost::side_length(500.0));
+
 	boost::kamada_kawai_spring_layout(myGraph, 
 		get(&cVertex::myPoint,myGraph),
+		get(&cVertex::myFixedLocation,myGraph),
 		get(&cEdge::myWeight, myGraph),
 		boost::square_topology<>(500.0),
 		boost::side_length(500.0));
