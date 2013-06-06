@@ -75,15 +75,13 @@ void cGraph::setFreeLocation( int i )
 	graph_t::vertex_descriptor v = *vertices(myGraph).first;
 	myGraph[v+i].myFixedLocation = false;
 }
-void cGraph::setFixedLocation( int i,  System::String^ sx, System::String^ sy )
+void cGraph::setFixedLocation( int i,  double x, double y )
 {
-		if( 0 > i || i >= getVertexCount() )
+	if( 0 > i || i >= getVertexCount() )
 		return ;
 	graph_t::vertex_descriptor v = *vertices(myGraph).first;
 	myGraph[v+i].myFixedLocation = true;
-	myGraph[v+i].setFixedLocation( 
-		System::Convert::ToDouble(sx),
-		System::Convert::ToDouble(sy));
+	myGraph[v+i].setFixedLocation( x, y );
 }
 
 /**
@@ -177,15 +175,9 @@ void cGraph::ArrangeCircle()
 void cGraph::ArrangeKK()
 {
 
-	boost::circle_graph_layout( myGraph,
-		get(&cVertex::myPoint,myGraph), 100.0);
-
-
-	//boost::kamada_kawai_spring_layout(myGraph, 
-	//	get(&cVertex::myPoint,myGraph),
-	//	get(&cEdge::myWeight, myGraph),
-	//	boost::square_topology<>(500.0),
-	//	boost::side_length(500.0));
+	boost::pin_circle_graph_layout( myGraph,
+		get(&cVertex::myPoint,myGraph),
+		get(&cVertex::myFixedLocation,myGraph),100.0);
 
 	boost::kamada_kawai_spring_layout(myGraph, 
 		get(&cVertex::myPoint,myGraph),

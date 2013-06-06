@@ -1,12 +1,15 @@
 class cVertex
 {
 public:
+	cVertex()
+		: myFixedLocation( false )
+	{}
 	void setName( const std::wstring& n ) {	myName = n; }
-	void setFixedLocation( double X, double Y )	{ myFixedX = X, myFixedY = Y; }
+	void setFixedLocation( double X, double Y )	{ myPoint[0] = X, myPoint[1] = Y; }
 	void Draw( System::Drawing::Graphics^ g );
 	void DrawAsSelected( System::Drawing::Graphics^ g );
-	int getScreenX()			{  return (int)myPoint[0]+200; }
-	int getScreenY()			{  return (int)myPoint[1]+200; }
+	int getScreenX()			{  return (int)myPoint[0]+250; }
+	int getScreenY()			{  return (int)myPoint[1]+250; }
 	bool IsHit( int mx, int my );
 	void Move( int mx, int my );
 
@@ -15,7 +18,6 @@ public:
 	int myColor;
 	boost::square_topology<>::point_type myPoint;
 	bool myFixedLocation;
-	double myFixedX, myFixedY;
 };
 
 class cEdge
@@ -59,7 +61,7 @@ public:
 	int getVertexCount()			{ return boost::num_vertices( myGraph); }
 	bool FindVertex( const std::wstring& n );
 	void setFreeLocation( int i );
-	void setFixedLocation( int i,  System::String^ sx, System::String^ sy );
+	void setFixedLocation( int i,  double x, double y );
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );

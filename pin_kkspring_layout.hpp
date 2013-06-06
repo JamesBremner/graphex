@@ -6,6 +6,10 @@
 
 //  Authors: Douglas Gregor
 //           Andrew Lumsdaine
+//			 James Bremner
+
+// Modified layout algorithms to allow pinned vertices that cannot move JB
+
 #ifndef BOOST_GRAPH_KAMADA_KAWAI_SPRING_LAYOUT_HPP
 #define BOOST_GRAPH_KAMADA_KAWAI_SPRING_LAYOUT_HPP
 
@@ -22,6 +26,49 @@
 #include <boost/config/no_tr1/cmath.hpp>
 
 namespace boost {
+
+
+  /** 
+   * \brief Layout the graph with the vertices at the points of a regular
+   * n-polygon. 
+   *
+   * The distance from the center of the polygon to each point is
+   * determined by the @p radius parameter. The @p position parameter
+   * must be an Lvalue Property Map whose value type is a class type
+   * containing @c x and @c y members that will be set to the @c x and
+   * @c y coordinates.
+   */
+  template<typename VertexListGraph, typename PositionMap,  typename PinMap, typename Radius>
+  void 
+  pin_circle_graph_layout(const VertexListGraph& g, PositionMap position, PinMap pin,
+                      Radius radius)
+  {
+    BOOST_STATIC_ASSERT (property_traits<PositionMap>::value_type::dimensions >= 2);
+    const double pi = boost::math::constants::pi<double>();
+
+#ifndef BOOST_NO_STDC_NAMESPACE
+    using std::sin;
+    using std::cos;
+#endif // BOOST_NO_STDC_NAMESPACE
+
+    typedef typename graph_traits<VertexListGraph>::vertices_size_type 
+      vertices_size_type;
+
+    vertices_size_type n = num_vertices(g);
+    
+    vertices_size_type i = 0;
+    double two_pi_over_n = 2. * pi / n;
+    BGL_FORALL_VERTICES_T(v, g, VertexListGraph) {
+		if( ! pin[v] ) {
+      position[v][0] = radius * cos(i * two_pi_over_n);
+      position[v][1] = radius * sin(i * two_pi_over_n);
+		}
+      ++i;
+    }
+  }
+
+
+
   namespace detail { namespace graph {
     /**
      * Denotes an edge or display area side length used to scale a
@@ -130,7 +177,7 @@ namespace boost {
     /**
      * Implementation of the Kamada-Kawai spring layout algorithm.
      */
-    template<typename Topology, typename Graph, typename PositionMap, typename WeightMap,
+    template<typename Topology, typename Graph, typename PositionMap, typename PinMap, typename WeightMap,
              typename EdgeOrSideLength, typename Done,
              typename VertexIndexMap, typename DistanceMatrix,
              typename SpringStrengthMatrix, typename PartialDerivativeMap>
@@ -148,6 +195,7 @@ namespace boost {
         const Topology& topology,
         const Graph& g, 
         PositionMap position,
+		PinMap pin,
         WeightMap weight, 
         EdgeOrSideLength edge_or_side_length,
         Done done,
@@ -156,7 +204,7 @@ namespace boost {
         DistanceMatrix distance,
         SpringStrengthMatrix spring_strength,
         PartialDerivativeMap partial_derivatives)
-        : topology(topology), g(g), position(position), weight(weight), 
+        : topology(topology), g(g), position(position), pin(pin), weight(weight), 
           edge_or_side_length(edge_or_side_length), done(done),
           spring_constant(spring_constant), index(index), distance(distance),
           spring_strength(spring_strength), 
@@ -238,19 +286,22 @@ namespace boost {
         
         // Compute Delta_i and find max
         vertex_descriptor p = *vertices(g).first;
+
         weight_type delta_p(0);
 
-        for (ui = vertices(g).first, end = vertices(g).second; ui != end; ++ui) {
-          deriv_type deriv = compute_partial_derivatives(*ui);
-          put(partial_derivatives, *ui, deriv);
+		for (ui = vertices(g).first, end = vertices(g).second; ui != end; ++ui) {
+			deriv_type deriv = compute_partial_derivatives(*ui);
+			put(partial_derivatives, *ui, deriv);
 
-          weight_type delta = topology.norm(deriv);
+			weight_type delta = topology.norm(deriv);
 
-          if (delta > delta_p) {
-            p = *ui;
-            delta_p = delta;
-          }
-        }
+			if (delta > delta_p) {
+				if( ! pin[*ui] ) {
+					p = *ui;
+					delta_p = delta;
+				}
+			}
+		}
 
         while (!done(delta_p, p, g, true)) {
           // The contribution p makes to the partial derivatives of
@@ -335,12 +386,14 @@ namespace boost {
             put(partial_derivatives, *ui, deriv);
             weight_type delta = topology.norm(deriv);
 
-            if (delta > delta_p) {
-              p = *ui;
-              delta_p = delta;
-            }
-          }
-        }
+			if (delta > delta_p) {
+				if( ! pin[*ui] ) {
+					p = *ui;
+					delta_p = delta;
+				}
+			}
+		  }
+		}
 
         return true;
       }
@@ -348,6 +401,7 @@ namespace boost {
       const Topology& topology;
       const Graph& g; 
       PositionMap position;
+	  PinMap pin;
       WeightMap weight; 
       EdgeOrSideLength edge_or_side_length;
       Done done;
@@ -492,7 +546,7 @@ namespace boost {
    * \returns @c true if layout was successful or @c false if a
    * negative weight cycle was detected.
    */
-  template<typename Topology, typename Graph, typename PositionMap, typename WeightMap,
+  template<typename Topology, typename Graph, typename PositionMap, typename PinMap, typename WeightMap,
            typename T, bool EdgeOrSideLength, typename Done,
            typename VertexIndexMap, typename DistanceMatrix,
            typename SpringStrengthMatrix, typename PartialDerivativeMap>
@@ -500,6 +554,7 @@ namespace boost {
   kamada_kawai_spring_layout(
     const Graph& g, 
     PositionMap position,
+	PinMap pin,
     WeightMap weight, 
     const Topology& topology,
     detail::graph::edge_or_side<EdgeOrSideLength, T> edge_or_side_length,
@@ -516,10 +571,10 @@ namespace boost {
                          >::value));
 
     detail::graph::kamada_kawai_spring_layout_impl<
-      Topology, Graph, PositionMap, WeightMap, 
+      Topology, Graph, PositionMap, PinMap, WeightMap, 
       detail::graph::edge_or_side<EdgeOrSideLength, T>, Done, VertexIndexMap, 
       DistanceMatrix, SpringStrengthMatrix, PartialDerivativeMap>
-      alg(topology, g, position, weight, edge_or_side_length, done, spring_constant,
+      alg(topology, g, position, pin, weight, edge_or_side_length, done, spring_constant,
           index, distance, spring_strength, partial_derivatives);
     return alg.run();
   }
@@ -527,13 +582,14 @@ namespace boost {
   /**
    * \overload
    */
-  template<typename Topology, typename Graph, typename PositionMap, typename WeightMap,
+  template<typename Topology, typename Graph, typename PositionMap, typename PinMap, typename WeightMap,
            typename T, bool EdgeOrSideLength, typename Done, 
            typename VertexIndexMap>
   bool 
   kamada_kawai_spring_layout(
     const Graph& g, 
     PositionMap position,
+	PinMap pin,
     WeightMap weight, 
     const Topology& topology,
     detail::graph::edge_or_side<EdgeOrSideLength, T> edge_or_side_length,
@@ -552,7 +608,7 @@ namespace boost {
 
     return 
       kamada_kawai_spring_layout(
-        g, position, weight, topology, edge_or_side_length, done, spring_constant, index,
+        g, position, pin, weight, topology, edge_or_side_length, done, spring_constant, index,
         distance.begin(),
         spring_strength.begin(),
         make_iterator_property_map(partial_derivatives.begin(), index,
@@ -562,19 +618,20 @@ namespace boost {
   /**
    * \overload
    */
-  template<typename Topology, typename Graph, typename PositionMap, typename WeightMap,
+  template<typename Topology, typename Graph, typename PositionMap, typename PinMap, typename WeightMap,
            typename T, bool EdgeOrSideLength, typename Done>
   bool 
   kamada_kawai_spring_layout(
     const Graph& g, 
     PositionMap position,
+	PinMap pin,
     WeightMap weight, 
     const Topology& topology,
     detail::graph::edge_or_side<EdgeOrSideLength, T> edge_or_side_length,
     Done done,
     typename property_traits<WeightMap>::value_type spring_constant)
   {
-    return kamada_kawai_spring_layout(g, position, weight, topology, edge_or_side_length,
+    return kamada_kawai_spring_layout(g, position, pin, weight, topology, edge_or_side_length,
                                       done, spring_constant, 
                                       get(vertex_index, g));
   }
@@ -582,19 +639,20 @@ namespace boost {
   /**
    * \overload
    */
-  template<typename Topology, typename Graph, typename PositionMap, typename WeightMap,
+  template<typename Topology, typename Graph, typename PositionMap, typename PinMap, typename WeightMap,
            typename T, bool EdgeOrSideLength, typename Done>
   bool 
   kamada_kawai_spring_layout(
     const Graph& g, 
     PositionMap position,
+	PinMap pin,
     WeightMap weight, 
     const Topology& topology,
     detail::graph::edge_or_side<EdgeOrSideLength, T> edge_or_side_length,
     Done done)
   {
     typedef typename property_traits<WeightMap>::value_type weight_type;
-    return kamada_kawai_spring_layout(g, position, weight, topology, edge_or_side_length,
+    return kamada_kawai_spring_layout(g, position, pin, weight, topology, edge_or_side_length,
                                       done, weight_type(1)); 
   }
 
@@ -613,7 +671,8 @@ namespace boost {
     detail::graph::edge_or_side<EdgeOrSideLength, T> edge_or_side_length)
   {
     typedef typename property_traits<WeightMap>::value_type weight_type;
-    return kamada_kawai_spring_layout(g, position, weight, topology, edge_or_side_length,
+    return kamada_kawai_spring_layout(g, position, pin, weight, topology,
+									  edge_or_side_length,
                                       layout_tolerance<weight_type>(),
                                       weight_type(1.0), 
                                       get(vertex_index, g));

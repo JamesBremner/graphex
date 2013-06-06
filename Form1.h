@@ -405,10 +405,18 @@ private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System
 						 // free location
 						 theGraph.setFreeLocation( e->RowIndex );
 				 } else {
-					 theGraph.setFixedLocation( e->RowIndex,
-						 VertexGridView->Rows[e->RowIndex]->Cells[1]->Value->ToString(),
-						 VertexGridView->Rows[e->RowIndex]->Cells[2]->Value->ToString() );
-
+					 double x, y;
+					 if( VertexGridView->Rows[e->RowIndex]->Cells[1]->Value == nullptr ) {
+						 x = 0.0;
+					 } else {
+						 x = Convert::ToDouble(VertexGridView->Rows[e->RowIndex]->Cells[1]->Value);
+					 }
+					 if( VertexGridView->Rows[e->RowIndex]->Cells[2]->Value == nullptr ) {
+						 y = 0.0;
+					 } else {
+						 y = Convert::ToDouble(VertexGridView->Rows[e->RowIndex]->Cells[2]->Value);
+					 }
+					 theGraph.setFixedLocation( e->RowIndex, x, y );
 				 }
 			 }
 
