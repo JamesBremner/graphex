@@ -1,17 +1,19 @@
 #pragma once
 
-#include "cOptions.h"
-#include "cGraph.h"
-
-
-namespace graphex {
-
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+
+
+#include "cOptions.h"
+#include "cGraph.h"
+
+
+namespace graphex {
+
 
 
 			 enum display_enum {
@@ -39,6 +41,7 @@ namespace graphex {
 			theOptions = gcnew cOptions();
 			InitializeComponent();
 			GraphPropertyGrid->SelectedObject = theOptions;
+			theGraph.OpenDB( theOptions );
 		} 
 
 	protected:

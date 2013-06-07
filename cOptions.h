@@ -1,3 +1,5 @@
+#pragma once
+using namespace System;
 namespace graphex {
 
 	using namespace System::ComponentModel;
@@ -35,10 +37,13 @@ public ref class cOptions
 {
 public:
 		eLayout^ myLayout;
+		System::String^ myDBFilepath;
 public:
 
 	cOptions()
 		: myLayout(eLayout::Circle)
+//		, myDBFilepath( gcnew String(L"C:/ProgramData/ravenspoint/graphex.dat"))
+		, myDBFilepath( gcnew String(L"graphex.dat"))
 	{}
 
 	[Category("Configuration")]
@@ -48,6 +53,14 @@ public:
 	{
 		eLayout^ get() { return myLayout; }
 		void set( eLayout^ value ) { myLayout = value; }
+	}
+
+	[Category("Configuration")]
+	[Description("Path to file storing project database")]
+	property String^ FilePath
+	{
+		String^ get() { return myDBFilepath; }
+		void set( String^ value ) { myDBFilepath = value; }
 	}
 
 };

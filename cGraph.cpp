@@ -3,6 +3,21 @@
 
 cGraph theGraph;
 
+cGraph::cGraph(  )
+: myVertexBoxSize( 30 )
+{}
+
+	// Open the database file
+bool cGraph::OpenDB( graphex::cOptions^ theOptions )
+{
+	String^ n1 = theOptions->myDBFilepath;
+	std::wstring n2 = msclr::interop::marshal_as<std::wstring>(n1);
+	theDB.Open( n2 );
+	if( theDB.myError )
+		return false;
+	return true;
+}
+
 /**
 
   get edge

@@ -1,3 +1,6 @@
+#include "raven_sqlite.h"
+#include "cOptions.h"
+
 class cVertex
 {
 public:
@@ -44,9 +47,8 @@ public:
 class cGraph
 {
 public:
-	cGraph()
-		: myVertexBoxSize( 30 )
-	{}
+	cGraph();
+	bool OpenDB( graphex::cOptions^ theOptions );
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
@@ -87,6 +89,9 @@ private:
 
 	int myVertexBoxSize;
 	vertex_iter_t mySelectedVertex;
+
+	// The database
+	raven::sqlite::cDB theDB;
 
 };
 
