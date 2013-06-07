@@ -269,6 +269,23 @@ private: System::Void btnVertices_Click(System::Object^  sender, System::EventAr
 			 System::Drawing::Rectangle r = this->ClientRectangle;
 			 VertexGridView->Location = System::Drawing::Point(130, 15);
 			 VertexGridView->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+
+			VertexGridView->RowCount = theGraph.getVertexCount();
+			for( int kv = 0; kv < theGraph.getVertexCount(); kv++ )
+			{
+				VertexGridView->Rows[kv]->Cells[0]->Value =
+					gcnew String( theGraph.getNameVertex( kv ).c_str() );
+				if( theGraph.IsPinned(kv) ) {
+					double x,y;
+					theGraph.getVertexLocation( x, y, kv );
+					VertexGridView->Rows[kv]->Cells[1]->Value = x;
+					VertexGridView->Rows[kv]->Cells[2]->Value = y;
+				} else {
+					// vertex is not pinned
+					VertexGridView->Rows[kv]->Cells[1]->Value = nullptr;
+					VertexGridView->Rows[kv]->Cells[2]->Value = nullptr;
+				}
+			}
 		 }
 		 /**
 

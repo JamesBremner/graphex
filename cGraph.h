@@ -9,6 +9,8 @@ public:
 	{}
 	void setName( const std::wstring& n ) {	myName = n; }
 	void setFixedLocation( double X, double Y )	{ myPoint[0] = X, myPoint[1] = Y; }
+	double getLocationX() { return myPoint[0]; }
+	double getLocationY() { return myPoint[0]; }
 	void Draw( System::Drawing::Graphics^ g );
 	void DrawAsSelected( System::Drawing::Graphics^ g );
 	int getScreenX()			{  return (int)myPoint[0]+250; }
@@ -49,6 +51,8 @@ class cGraph
 public:
 	cGraph();
 	bool OpenDB( graphex::cOptions^ theOptions );
+	void SaveToDB();
+	void LoadFromDB();
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
@@ -64,6 +68,8 @@ public:
 	bool FindVertex( const std::wstring& n );
 	void setFreeLocation( int i );
 	void setFixedLocation( int i,  double x, double y );
+	bool IsPinned( int i );
+	void getVertexLocation( double& x, double& y, int i );
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );

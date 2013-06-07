@@ -15,7 +15,49 @@ bool cGraph::OpenDB( graphex::cOptions^ theOptions )
 	theDB.Open( n2 );
 	if( theDB.myError )
 		return false;
+	theDB.Query(
+		L"CREATE TABLE IF NOT EXISTS vertex "
+		L"( vertex_id INTEGER PRIMARY KEY, "
+		L"name, X, Y, pinned );");
+
+	LoadFromDB();
+
 	return true;
+}
+
+void cGraph::SaveToDB()
+{
+	theDB.Query(L"DELETE FROM vertex;");
+
+	vertex_iter_t vi, vi_end;
+	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
+		const cVertex& v = myGraph[*vi];
+		theDB.Query(
+			L"INSERT INTO vertex "
+			L"( name, X, Y, pinned ) "
+			L"VALUES ( '%s', %f, %f, %d );",
+			v.myName.c_str(), v.myPoint[0], v.myPoint[1],
+			(int) v.myFixedLocation );
+	}	
+}
+
+void cGraph::LoadFromDB()
+{
+	myGraph.clear();
+
+	int row_count = theDB.Query(L"SELECT * FROM vertex;");
+
+	vertex_iter_t vi;
+	for( int k = 0; k < row_count; k++ ) {
+		boost::add_vertex(  myGraph );
+		vi = boost::vertices( myGraph ).second - 1;
+		myGraph[*vi].myName = theDB.myResult[k*5+1];
+		myGraph[*vi].myFixedLocation = (bool)_wtoi(theDB.myResult[k*5+4].c_str());
+		if( myGraph[*vi].myFixedLocation ) {
+			myGraph[*vi].myPoint[0] = _wtof(theDB.myResult[k*5+2].c_str());
+			myGraph[*vi].myPoint[1] = _wtof(theDB.myResult[k*5+3].c_str());
+		}
+	}
 }
 
 /**
@@ -89,6 +131,7 @@ void cGraph::setFreeLocation( int i )
 		return;
 	graph_t::vertex_descriptor v = *vertices(myGraph).first;
 	myGraph[v+i].myFixedLocation = false;
+	SaveToDB();
 }
 void cGraph::setFixedLocation( int i,  double x, double y )
 {
@@ -97,7 +140,23 @@ void cGraph::setFixedLocation( int i,  double x, double y )
 	graph_t::vertex_descriptor v = *vertices(myGraph).first;
 	myGraph[v+i].myFixedLocation = true;
 	myGraph[v+i].setFixedLocation( x, y );
+	SaveToDB();
 }
+
+bool cGraph::IsPinned( int i )
+{
+	if( 0 > i || i >= getVertexCount() )
+		return false ;
+	return myGraph[ *vertices(myGraph).first + i ].myFixedLocation;
+}
+void cGraph::getVertexLocation( double& x, double& y, int i )
+{
+	if( 0 > i || i >= getVertexCount() )
+		return;
+	x = myGraph[ *vertices(myGraph).first + i ].getLocationX();
+	y = myGraph[ *vertices(myGraph).first + i ].getLocationY();
+}
+
 
 /**
 
@@ -172,6 +231,8 @@ void cGraph::AddEdge( int row, int col, const std::wstring& name )
 void cGraph::AddVertex()
 { 
 	boost::add_vertex(  myGraph );
+
+	SaveToDB();
 }
 /**
 
@@ -198,8 +259,8 @@ void cGraph::ArrangeKK()
 		get(&cVertex::myPoint,myGraph),
 		get(&cVertex::myFixedLocation,myGraph),
 		get(&cEdge::myWeight, myGraph),
-		boost::square_topology<>(500.0),
-		boost::side_length(500.0));
+		boost::square_topology<>(),
+		boost::side_length(500.0 ) );
 }
 /**
 
