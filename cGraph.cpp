@@ -19,6 +19,10 @@ bool cGraph::OpenDB( graphex::cOptions^ theOptions )
 		L"CREATE TABLE IF NOT EXISTS vertex "
 		L"( vertex_id INTEGER PRIMARY KEY, "
 		L"name, X, Y, pinned );");
+	theDB.Query(
+		L"CREATE TABLE IF NOT EXISTS edge "
+		L"( edge_id INTEGER PRIMARY KEY, "
+		L"a, b );");
 
 	LoadFromDB();
 
@@ -28,6 +32,7 @@ bool cGraph::OpenDB( graphex::cOptions^ theOptions )
 void cGraph::SaveToDB()
 {
 	theDB.Query(L"DELETE FROM vertex;");
+	theDB.Query(L"DELETE FROM edge;");
 
 	vertex_iter_t vi, vi_end;
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
@@ -39,6 +44,21 @@ void cGraph::SaveToDB()
 			v.myName.c_str(), v.myPoint[0], v.myPoint[1],
 			(int) v.myFixedLocation );
 	}	
+
+	int a,b;
+	edge_iter_t ei, ei_end;
+	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
+		a=source(*ei,myGraph);
+		b=target(*ei,myGraph);
+		theDB.Query(
+			L"INSERT INTO edge "
+			L"( a, b ) "
+			L"VALUES ( %d, %d );",
+			a, b );
+
+	}
+
+
 }
 
 void cGraph::LoadFromDB()
@@ -52,11 +72,20 @@ void cGraph::LoadFromDB()
 		boost::add_vertex(  myGraph );
 		vi = boost::vertices( myGraph ).second - 1;
 		myGraph[*vi].myName = theDB.myResult[k*5+1];
-		myGraph[*vi].myFixedLocation = (bool)_wtoi(theDB.myResult[k*5+4].c_str());
+		myGraph[*vi].myFixedLocation = _wtoi(theDB.myResult[k*5+4].c_str());
 		if( myGraph[*vi].myFixedLocation ) {
 			myGraph[*vi].myPoint[0] = _wtof(theDB.myResult[k*5+2].c_str());
 			myGraph[*vi].myPoint[1] = _wtof(theDB.myResult[k*5+3].c_str());
 		}
+	}
+
+	row_count = theDB.Query(L"SELECT * FROM edge;");
+
+	for( int k = 0; k < row_count; k++ ) {
+		int a,b;
+		a = _wtoi( theDB.myResult[k*3+1].c_str());
+		b = _wtoi( theDB.myResult[k*3+2].c_str());
+		boost::add_edge( a, b, myGraph );
 	}
 }
 
@@ -75,9 +104,19 @@ bool cGraph::getEdge( int& iva, int& ivb, int idx )
 {
 	if( 0 > idx || idx >= getEdgeCount() )
 		return false;
-	graph_t::edge_descriptor e = *edges(myGraph).first;
-	iva = source( e, myGraph );
-	ivb = target( e, myGraph );
+
+	edge_iter_t ei = edges(myGraph).first;
+
+	/* For some reason this does not work! */
+	//ei += idx;
+
+	// We have to do this instead  ( http://www.freelancer.com/users/messages/index.php#/thread/82222017 )
+	for( int k = 0; k < idx; k++ ) {
+		ei++;
+	}
+
+	iva = source( *ei, myGraph );
+	ivb = target( *ei, myGraph );
 
 	return true;
 
@@ -226,6 +265,8 @@ const std::wstring& cGraph::getNameVertex( int i )
 void cGraph::AddEdge( int row, int col, const std::wstring& name )
 {
 	boost::add_edge( row, col, myGraph );
+
+	SaveToDB();
 }
 
 void cGraph::AddVertex()

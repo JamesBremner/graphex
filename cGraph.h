@@ -10,7 +10,7 @@ public:
 	void setName( const std::wstring& n ) {	myName = n; }
 	void setFixedLocation( double X, double Y )	{ myPoint[0] = X, myPoint[1] = Y; }
 	double getLocationX() { return myPoint[0]; }
-	double getLocationY() { return myPoint[0]; }
+	double getLocationY() { return myPoint[1]; }
 	void Draw( System::Drawing::Graphics^ g );
 	void DrawAsSelected( System::Drawing::Graphics^ g );
 	int getScreenX()			{  return (int)myPoint[0]+250; }
@@ -27,8 +27,6 @@ public:
 
 class cEdge
 {
-	int a;
-	int b;
 public:
 
 	cEdge() 
@@ -42,6 +40,8 @@ public:
 	bool operator ==( const cEdge& other ) const
 	{ return a == other.a && b == other.b; }
 
+	int a;
+	int b;
 	double myWeight;
 };
 

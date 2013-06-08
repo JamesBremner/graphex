@@ -96,12 +96,12 @@ namespace graphex {
 			this->btnOptions = (gcnew System::Windows::Forms::Button());
 			this->VertexGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->Name = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->FixedX = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+			this->FixedY = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 			this->EdgeGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->MatrixGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->graphpanel = (gcnew System::Windows::Forms::Panel());
 			this->GraphPropertyGrid = (gcnew System::Windows::Forms::PropertyGrid());
-			this->FixedX = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
-			this->FixedY = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->MatrixGridView))->BeginInit();
@@ -175,6 +175,16 @@ namespace graphex {
 			this->Name->HeaderText = L"Name";
 			this->Name->Name = L"Name";
 			// 
+			// FixedX
+			// 
+			this->FixedX->HeaderText = L"FixedX";
+			this->FixedX->Name = L"FixedX";
+			// 
+			// FixedY
+			// 
+			this->FixedY->HeaderText = L"FixedY";
+			this->FixedY->Name = L"FixedY";
+			// 
 			// EdgeGridView
 			// 
 			this->EdgeGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
@@ -208,20 +218,12 @@ namespace graphex {
 			// 
 			// GraphPropertyGrid
 			// 
+			this->GraphPropertyGrid->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+				static_cast<System::Byte>(0)));
 			this->GraphPropertyGrid->Location = System::Drawing::Point(166, 192);
 			this->GraphPropertyGrid->Name = L"GraphPropertyGrid";
 			this->GraphPropertyGrid->Size = System::Drawing::Size(130, 130);
 			this->GraphPropertyGrid->TabIndex = 9;
-			// 
-			// FixedX
-			// 
-			this->FixedX->HeaderText = L"FixedX";
-			this->FixedX->Name = L"FixedX";
-			// 
-			// FixedY
-			// 
-			this->FixedY->HeaderText = L"FixedY";
-			this->FixedY->Name = L"FixedY";
 			// 
 			// Form1
 			// 
