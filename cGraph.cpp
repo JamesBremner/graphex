@@ -8,8 +8,10 @@ cGraph::cGraph(  )
 {}
 
 	// Open the database file
-bool cGraph::OpenDB( graphex::cOptions^ theOptions )
+bool cGraph::OpenDB()
 {
+	theDB.Close();
+
 	String^ n1 = theOptions->myDBFilepath;
 	std::wstring n2 = msclr::interop::marshal_as<std::wstring>(n1);
 	theDB.Open( n2 );

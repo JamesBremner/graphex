@@ -37,11 +37,13 @@ namespace graphex {
 	public:
 		Form1(void)
 			: flagVertexDragging( false )
+			, flagfilling( false )
 		{
 			theOptions = gcnew cOptions();
 			InitializeComponent();
 			GraphPropertyGrid->SelectedObject = theOptions;
-			theGraph.OpenDB( theOptions );
+			theGraph.setOptions( theOptions );
+			theGraph.OpenDB();
 		} 
 
 	protected:
@@ -55,6 +57,12 @@ namespace graphex {
 				delete components;
 			}
 		}
+
+			display_enum  myCurDisplay;
+			cOptions^ theOptions;
+			bool flagVertexDragging;
+			bool flagfilling;
+
 	private: System::Windows::Forms::Button^  btnVertices;
 	private: System::Windows::Forms::Button^  btnMatrix;
 	private: System::Windows::Forms::Button^  btnEdges;
@@ -65,10 +73,6 @@ namespace graphex {
 	private: System::Windows::Forms::DataGridView^  MatrixGridView;
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  Name;
 	private: System::Windows::Forms::Panel^  graphpanel;
-
-			display_enum  myCurDisplay;
-			cOptions^ theOptions;
-			bool flagVertexDragging;
 	private: System::Windows::Forms::PropertyGrid^  GraphPropertyGrid;
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  FixedX;
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  FixedY;
@@ -224,6 +228,7 @@ namespace graphex {
 			this->GraphPropertyGrid->Name = L"GraphPropertyGrid";
 			this->GraphPropertyGrid->Size = System::Drawing::Size(130, 130);
 			this->GraphPropertyGrid->TabIndex = 9;
+			this->GraphPropertyGrid->PropertyValueChanged += gcnew System::Windows::Forms::PropertyValueChangedEventHandler(this, &Form1::GraphPropertyGrid_PropertyValueChanged);
 			// 
 			// Form1
 			// 
@@ -272,6 +277,14 @@ private: System::Void btnVertices_Click(System::Object^  sender, System::EventAr
 			 VertexGridView->Location = System::Drawing::Point(130, 15);
 			 VertexGridView->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
 
+			 flagfilling = true;
+
+			 if( theGraph.getVertexCount() < 1 ) {
+				 VertexGridView->Rows->Clear();
+				 flagfilling = false;
+				 return;
+			 }
+
 			VertexGridView->RowCount = theGraph.getVertexCount();
 			for( int kv = 0; kv < theGraph.getVertexCount(); kv++ )
 			{
@@ -288,6 +301,9 @@ private: System::Void btnVertices_Click(System::Object^  sender, System::EventAr
 					VertexGridView->Rows[kv]->Cells[2]->Value = nullptr;
 				}
 			}
+
+			flagfilling = false;
+
 		 }
 		 /**
 
@@ -458,6 +474,8 @@ private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows:
 
 		 }
 private: System::Void VertexGridView_RowsRemoved(System::Object^  sender, System::Windows::Forms::DataGridViewRowsRemovedEventArgs^  e) {
+			 if( flagfilling )
+				 return;
 			 theGraph.RemoveVertex(e->RowIndex);
 		 }
 private: System::Void graphpanel_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
@@ -482,6 +500,12 @@ private: System::Void graphpanel_MouseMove(System::Object^  sender, System::Wind
 			 *(theOptions->myLayout) = eLayout::Manual; 
 		 }
 
+private: System::Void GraphPropertyGrid_PropertyValueChanged(System::Object^  s, System::Windows::Forms::PropertyValueChangedEventArgs^  e) {
+			 if( e->ChangedItem->Label == "FilePath" ) {
+				 theGraph.Clear();
+				 theGraph.OpenDB();
+			 }
+		 }
 };
 }
 

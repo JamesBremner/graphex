@@ -50,7 +50,9 @@ class cGraph
 {
 public:
 	cGraph();
-	bool OpenDB( graphex::cOptions^ theOptions );
+	void setOptions( graphex::cOptions^ O )		{ theOptions = O; }
+	void Clear()								{ myGraph.clear(); }
+	bool OpenDB();
 	void SaveToDB();
 	void LoadFromDB();
 	void AddVertex();
@@ -98,6 +100,9 @@ private:
 
 	// The database
 	raven::sqlite::cDB theDB;
+
+	// The Options
+	gcroot< graphex::cOptions^ > theOptions;
 
 };
 
