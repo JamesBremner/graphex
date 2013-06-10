@@ -57,7 +57,9 @@ public:
 
 	[Category("Configuration")]
 	[Description("Path to file storing project database")]
-	property String^ FilePath
+	[Editor(System::Windows::Forms::Design::FileNameEditor::typeid,
+		System::Drawing::Design::UITypeEditor::typeid)]
+    property String^ FilePath
 	{
 		String^ get() { return myDBFilepath; }
 		void set( String^ value ) { myDBFilepath = value; }
