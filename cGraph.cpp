@@ -66,6 +66,20 @@ void cGraph::SaveToDB()
 
 }
 
+void cGraph::SaveSelectedVertexLocationToDB()
+{
+	if( ! IsSelectedVertex() )
+		return;
+
+	theDB.Query(
+		L"UPDATE vertex SET X = %f, Y = %f WHERE vertex_ID = %d;",
+		myGraph[ *mySelectedVertex ].getLocationX(),
+		myGraph[ *mySelectedVertex ].getLocationY(),
+		mySelectedVertex + 1 );
+
+
+}
+
 void cGraph::LoadFromDB()
 {
 	myGraph.clear();
@@ -78,10 +92,10 @@ void cGraph::LoadFromDB()
 		vi = boost::vertices( myGraph ).second - 1;
 		myGraph[*vi].myName = theDB.myResult[k*5+1];
 		myGraph[*vi].myFixedLocation = _wtoi(theDB.myResult[k*5+4].c_str());
-		if( myGraph[*vi].myFixedLocation ) {
+		//if( myGraph[*vi].myFixedLocation ) {
 			myGraph[*vi].myPoint[0] = _wtof(theDB.myResult[k*5+2].c_str());
 			myGraph[*vi].myPoint[1] = _wtof(theDB.myResult[k*5+3].c_str());
-		}
+		//}
 	}
 
 	row_count = theDB.Query(L"SELECT * FROM edge;");
@@ -319,6 +333,8 @@ void cGraph::ArrangeKK()
 		get(&cEdge::myWeight, myGraph),
 		boost::square_topology<>(),
 		boost::edge_length(30.0 ) );
+
+	SaveToDB();
 }
 /**
 

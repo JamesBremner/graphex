@@ -41,7 +41,7 @@ public:
 public:
 
 	cOptions()
-		: myLayout(eLayout::Spring)
+		: myLayout(eLayout::Manual)
 //		, myDBFilepath( gcnew String(L"C:/ProgramData/ravenspoint/graphex.dat"))
 		, myDBFilepath( gcnew String(L"graphex.dat"))
 	{}

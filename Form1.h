@@ -489,6 +489,9 @@ private: System::Void graphpanel_MouseDown(System::Object^  sender, System::Wind
 
 		 }
 private: System::Void graphpanel_MouseUp(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
+			 if( flagVertexDragging ) {
+				 theGraph.SaveSelectedVertexLocationToDB();
+			 }
 			 flagVertexDragging = false;
 		 }
 private: System::Void graphpanel_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {

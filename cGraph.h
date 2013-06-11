@@ -55,6 +55,7 @@ public:
 	bool OpenDB();
 	void SaveToDB();
 	void LoadFromDB();
+	void SaveSelectedVertexLocationToDB();
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
 	void RemoveEdge( int a, int b );
