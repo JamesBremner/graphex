@@ -36,6 +36,7 @@ void cGraph::SaveToDB()
 	theDB.Query(L"DELETE FROM vertex;");
 	theDB.Query(L"DELETE FROM edge;");
 
+	theDB.Query(L"BEGIN TRANSACTION;");
 	vertex_iter_t vi, vi_end;
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
 		const cVertex& v = myGraph[*vi];
@@ -46,7 +47,8 @@ void cGraph::SaveToDB()
 			v.myName.c_str(), v.myPoint[0], v.myPoint[1],
 			(int) v.myFixedLocation );
 	}	
-
+	theDB.Query(L"END TRANSACTION;");
+	theDB.Query(L"BEGIN TRANSACTION;");
 	int a,b;
 	edge_iter_t ei, ei_end;
 	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
@@ -59,6 +61,7 @@ void cGraph::SaveToDB()
 			a, b );
 
 	}
+	theDB.Query(L"END TRANSACTION;");
 
 
 }
@@ -277,6 +280,18 @@ void cGraph::AddVertex()
 
 	SaveToDB();
 }
+
+	void cGraph::RemoveEdge( int a, int b )	
+	{ 
+		boost::remove_edge( a, b, myGraph );
+	SaveToDB();
+	}
+	void cGraph::RemoveVertex( int i )		
+	{ 
+		boost::remove_vertex( i, myGraph );
+	SaveToDB();
+	}
+
 /**
 
   Arrange the vertices in a circle
@@ -303,7 +318,7 @@ void cGraph::ArrangeKK()
 		get(&cVertex::myFixedLocation,myGraph),
 		get(&cEdge::myWeight, myGraph),
 		boost::square_topology<>(),
-		boost::side_length(500.0 ) );
+		boost::edge_length(30.0 ) );
 }
 /**
 
@@ -432,6 +447,7 @@ bool cVertex::IsHit( int mx, int my)
 */
 void cVertex::Move( int mx, int my )
 {
-	myPoint[0] = mx-200;
-	myPoint[1] = my-200;
+	myPoint[0] = mx-250;
+	myPoint[1] = my-250;
 }
+ 

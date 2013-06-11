@@ -168,6 +168,7 @@ namespace graphex {
 				this->FixedX, this->FixedY});
 			this->VertexGridView->Location = System::Drawing::Point(166, 13);
 			this->VertexGridView->Name = L"VertexGridView";
+			this->VertexGridView->RowHeadersWidth = 30;
 			this->VertexGridView->Size = System::Drawing::Size(151, 150);
 			this->VertexGridView->TabIndex = 5;
 			this->VertexGridView->UserAddedRow += gcnew System::Windows::Forms::DataGridViewRowEventHandler(this, &Form1::VertexGridView_UserAddedRow);
@@ -204,6 +205,7 @@ namespace graphex {
 			this->MatrixGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->MatrixGridView->Location = System::Drawing::Point(518, 13);
 			this->MatrixGridView->Name = L"MatrixGridView";
+			this->MatrixGridView->RowHeadersWidth = 100;
 			this->MatrixGridView->Size = System::Drawing::Size(128, 150);
 			this->MatrixGridView->TabIndex = 7;
 			this->MatrixGridView->CellEndEdit += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &Form1::MatrixGridView_CellEndEdit);
@@ -285,7 +287,7 @@ private: System::Void btnVertices_Click(System::Object^  sender, System::EventAr
 				 return;
 			 }
 
-			VertexGridView->RowCount = theGraph.getVertexCount();
+			VertexGridView->RowCount = theGraph.getVertexCount()+1;
 			for( int kv = 0; kv < theGraph.getVertexCount(); kv++ )
 			{
 				VertexGridView->Rows[kv]->Cells[0]->Value =

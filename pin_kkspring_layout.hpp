@@ -275,8 +275,14 @@ namespace boost {
           vertex_iterator vi = ui;
           for (++vi; vi != end; ++vi) {
             weight_type dij = distance[get(index, *ui)][get(index, *vi)];
-            if (dij == (std::numeric_limits<weight_type>::max)())
-              return false;
+			if (dij == (std::numeric_limits<weight_type>::max)()) {
+				/** These two vertices are disconnected,
+				There is no path between them
+				Set the distance to 'infinite'
+				So the strength of the spring betweebn them will be very low
+				*/
+  				dij = 1000.0;
+			}
             distance[get(index, *ui)][get(index, *vi)] = edge_length * dij;
             distance[get(index, *vi)][get(index, *ui)] = edge_length * dij;
             spring_strength[get(index, *ui)][get(index, *vi)] = K/(dij*dij);

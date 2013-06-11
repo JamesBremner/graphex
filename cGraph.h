@@ -57,8 +57,8 @@ public:
 	void LoadFromDB();
 	void AddVertex();
 	void AddEdge( int row, int col, const std::wstring& name );
-	void RemoveEdge( int a, int b )		{ boost::remove_edge( a, b, myGraph ); }
-	void RemoveVertex( int i )			{ boost::remove_vertex( i, myGraph ); }
+	void RemoveEdge( int a, int b );
+	void RemoveVertex( int i );
 
 	void ArrangeCircle();
 	void ArrangeKK();
