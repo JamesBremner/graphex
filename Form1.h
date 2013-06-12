@@ -326,6 +326,13 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 			{
 				MatrixGridView->Columns[kv]->HeaderText = gcnew String( theGraph.getNameVertex( kv ).c_str() );
 				MatrixGridView->Rows[kv]->HeaderCell->Value = gcnew String( theGraph.getNameVertex( kv ).c_str() );
+
+				for( int kc = kv; kc <  theGraph.getVertexCount(); kc++ ) {
+					MatrixGridView->Rows[kv]->Cells[kc]->Style->BackColor = Color::Wheat;
+				}
+
+				MatrixGridView->Columns[kv]->Width = 50;
+	
 			}
 
 

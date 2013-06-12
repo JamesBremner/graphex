@@ -318,7 +318,9 @@ void cGraph::AddVertex()
 */
 void cGraph::ArrangeCircle()
 {
-	boost::circle_graph_layout( myGraph,  get(&cVertex::myPoint,myGraph), 100.0);
+	boost::pin_circle_graph_layout( myGraph,
+		get(&cVertex::myPoint,myGraph),
+		get(&cVertex::myFixedLocation,myGraph), 100.0);
 }
 /**
 
