@@ -64,6 +64,7 @@ public:
 	void ArrangeCircle();
 	void ArrangeKK();
 	void MapColor();
+	bool IsPlanar();
 
 	int setNameVertex( int i,  System::String^ n );
 	const std::wstring& getNameVertex( int i );

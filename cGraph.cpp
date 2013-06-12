@@ -306,6 +306,11 @@ void cGraph::AddVertex()
 	SaveToDB();
 	}
 
+	bool cGraph::IsPlanar()
+	{
+		return boost::boyer_myrvold_planarity_test( myGraph );
+	}
+
 /**
 
   Arrange the vertices in a circle

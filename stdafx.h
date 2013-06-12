@@ -12,5 +12,6 @@
 #include <boost/graph/circle_layout.hpp>
 //#include <boost/graph/kamada_kawai_spring_layout.hpp>
 #include <boost/graph/sequential_vertex_coloring.hpp>
+#include <boost/graph/boyer_myrvold_planar_test.hpp>
 
 #include "pin_kkspring_layout.hpp"

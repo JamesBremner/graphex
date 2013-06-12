@@ -345,21 +345,6 @@ private: System::Void btnMatrix_Click(System::Object^  sender, System::EventArgs
 		 */
 private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs^  e) {
 
-			 // update the layout
-			 switch( *(theOptions->myLayout) ) {
-				 case eLayout::Manual:
-				 default:
-					 break;
-				 case eLayout::Circle:
-					theGraph.ArrangeCircle();
-					break;
-				 case eLayout::Spring:
-					 theGraph.ArrangeKK();
-					 break;
-			 }
-
-			 theGraph.MapColor();
-
 			 // display the graph panel
 			 HideAll();
 			 myCurDisplay = graph;
@@ -367,6 +352,32 @@ private: System::Void btnLayout_Click(System::Object^  sender, System::EventArgs
 			 System::Drawing::Rectangle r = this->ClientRectangle;
 			 graphpanel->Location = System::Drawing::Point(130, 15);
 			 graphpanel->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+
+			 if( ! theGraph.IsPlanar() ) {
+				 Graphics^ g = graphpanel->CreateGraphics();
+				 g->DrawString(
+					 L"ERROR: Graph is not Planar",
+					 gcnew System::Drawing::Font( "Arial",16 ),
+					 gcnew SolidBrush( Color::Red ),
+					 25,25 );
+				 delete g;
+				 return;
+			 }
+			 // update the layout
+			 switch( *(theOptions->myLayout) ) {
+				 case eLayout::Manual:
+				 default:
+					 break;
+				 case eLayout::Circle:
+					 theGraph.ArrangeCircle();
+					 break;
+				 case eLayout::Spring:
+					 theGraph.ArrangeKK();
+					 break;
+			 }
+
+			 theGraph.MapColor();
+
 
 			 // redraw it
 			 graphpanel->Invalidate();
