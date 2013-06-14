@@ -501,7 +501,25 @@ private: System::Void VertexGridView_RowsRemoved(System::Object^  sender, System
 private: System::Void graphpanel_MouseClick(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 		 }
 private: System::Void graphpanel_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-			 theGraph.MouseClick(e->X,e->Y);
+			 if ( Control::ModifierKeys == Keys::Shift ) {
+				 // user has clicked with shift key pressed
+				 // If he has selected a second vertex
+				 // add edge, or remove if already present
+				 int old_selected_index = theGraph.getVertexSelectedIndex();
+				 theGraph.MouseClick(e->X,e->Y);
+				 if( old_selected_index >= 0 ) {		 
+					 int new_selected_index = theGraph.getVertexSelectedIndex();
+					 if( new_selected_index >= 0 ) {
+						 if( theGraph.IsEdge( old_selected_index, new_selected_index ) ) {
+							 theGraph.RemoveEdge(  old_selected_index, new_selected_index );
+						 } else {
+							theGraph.AddEdge( old_selected_index, new_selected_index, L"" );
+						 }
+					 }
+				 }
+			 } else {
+				 theGraph.MouseClick(e->X,e->Y);
+			 }
 			 graphpanel->Invalidate();
 			 flagVertexDragging = theGraph.IsSelectedVertex();
 

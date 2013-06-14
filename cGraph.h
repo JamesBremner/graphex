@@ -77,12 +77,15 @@ public:
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );
+	bool IsEdge( int iva, int ivb );
+
 	int getVertexBoxSize()			{ return myVertexBoxSize; }
 
 	void DrawLayout( System::Drawing::Graphics^ g );
 
 	void MouseClick( int x, int y );
 	bool IsSelectedVertex();
+	int  getVertexSelectedIndex();
 	void setLocationSelectedVertex( int mx, int my );
 
 private:

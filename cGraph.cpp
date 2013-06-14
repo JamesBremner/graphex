@@ -91,7 +91,7 @@ void cGraph::LoadFromDB()
 		boost::add_vertex(  myGraph );
 		vi = boost::vertices( myGraph ).second - 1;
 		myGraph[*vi].myName = theDB.myResult[k*5+1];
-		myGraph[*vi].myFixedLocation = _wtoi(theDB.myResult[k*5+4].c_str());
+		myGraph[*vi].myFixedLocation = _wtoi(theDB.myResult[k*5+4].c_str()) != 0;
 		//if( myGraph[*vi].myFixedLocation ) {
 			myGraph[*vi].myPoint[0] = _wtof(theDB.myResult[k*5+2].c_str());
 			myGraph[*vi].myPoint[1] = _wtof(theDB.myResult[k*5+3].c_str());
@@ -129,7 +129,7 @@ bool cGraph::getEdge( int& iva, int& ivb, int idx )
 	/* For some reason this does not work! */
 	//ei += idx;
 
-	// We have to do this instead  ( http://www.freelancer.com/users/messages/index.php#/thread/82222017 )
+	// We have to do this instead  ( http://stackoverflow.com/q/17001541/16582 )
 	for( int k = 0; k < idx; k++ ) {
 		ei++;
 	}
@@ -141,6 +141,12 @@ bool cGraph::getEdge( int& iva, int& ivb, int idx )
 
 
 }
+
+bool cGraph::IsEdge( int iva, int ivb )
+{
+	return boost::edge( iva, ivb, myGraph ).second;
+}
+
 /**
 
   Change the name of a vertex
@@ -253,6 +259,23 @@ bool cGraph::IsSelectedVertex()
 	tie(vi, vi_end) = vertices(myGraph);
 	return mySelectedVertex != vi_end;
 }
+/**
+
+  Index to selected vertex
+
+  @return -1 if no selected vertexs
+
+*/
+int cGraph::getVertexSelectedIndex()
+{
+	vertex_iter_t vi, vi_end;
+	tie(vi, vi_end) = vertices(myGraph);
+	if( mySelectedVertex == vi_end )
+		return -1;
+	return (int) ( mySelectedVertex - vi );
+
+}
+
 /**
 
   Move the selected vertex
