@@ -17,9 +17,11 @@ public:
 	int getScreenY()			{  return (int)myPoint[1]+250; }
 	bool IsHit( int mx, int my );
 	void Move( int mx, int my );
+	void ConvertFromUTF8();
 
 
 	std::wstring myName;
+	std::string myName_utf8;
 	int myColor;
 	boost::square_topology<>::point_type myPoint;
 	bool myFixedLocation;
@@ -43,6 +45,12 @@ public:
 	int a;
 	int b;
 	double myWeight;
+};
+
+class cGraphProps {
+public:
+	std::string myName;
+	int myInt;
 };
 
 
@@ -88,12 +96,14 @@ public:
 	int  getVertexSelectedIndex();
 	void setLocationSelectedVertex( int mx, int my );
 
+	void ReadGraphML();
+
 private:
 
 	// The BGL graph
  	typedef boost::adjacency_list <
 		boost::vecS, boost::vecS, boost::undirectedS,
-		cVertex, cEdge  >
+		cVertex, cEdge, cGraphProps  >
 				graph_t;
 	graph_t myGraph;
 

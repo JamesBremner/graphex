@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "cGraph.h"
 
+
+
 cGraph theGraph;
 
 cGraph::cGraph(  )
@@ -27,6 +29,7 @@ bool cGraph::OpenDB()
 		L"a, b );");
 
 	LoadFromDB();
+
 
 	return true;
 }
@@ -416,6 +419,38 @@ void cGraph::DrawLayout( System::Drawing::Graphics^ g )
 	}
 
 }
+void cGraph::ReadGraphML()
+{
+
+	boost::dynamic_properties dp;
+	dp.property("name", boost::get(&cVertex::myName_utf8, myGraph));
+
+	//std::ofstream fout( "test2.gml");
+	//boost::write_graphml( fout, myGraph, dp, true );
+
+	//dp.property("color", boost::get(&cVertex::myColor, myGraph));
+
+	//std::map< std::string, std::string > attribute_name2name;
+	//boost::associative_property_map< std::map< std::string, std::string > > graphname_map( attribute_name2name );
+	//dp.property("graphname", graphname_map );
+
+	myGraph.clear();
+	std::ifstream fin("test.gml");
+	if( ! fin.is_open() ) {
+		return;
+	}
+	boost::read_graphml( fin, myGraph, dp );
+
+	//myGraph[boost::graph_bundle].myName = get(graphname_map,"graphname");
+
+	// convert from UTF8 to UTF16
+	//vertex_iter_t vi, vi_end;
+	//for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
+	//	myGraph[*vi].ConvertFromUTF8();
+	//}
+
+}
+
 /**
 
   Draw vertex on screen
@@ -497,3 +532,8 @@ void cVertex::Move( int mx, int my )
 	myPoint[1] = my-250;
 }
  
+void cVertex::ConvertFromUTF8()
+{
+	raven::cUTF utf( myName_utf8 );
+	myName = utf.get16();
+}

@@ -63,11 +63,11 @@ namespace graphex {
 			bool flagVertexDragging;
 			bool flagfilling;
 
-	private: System::Windows::Forms::Button^  btnVertices;
-	private: System::Windows::Forms::Button^  btnMatrix;
-	private: System::Windows::Forms::Button^  btnEdges;
-	private: System::Windows::Forms::Button^  btnLayout;
-	private: System::Windows::Forms::Button^  btnOptions;
+
+
+
+
+
 	private: System::Windows::Forms::DataGridView^  VertexGridView;
 	private: System::Windows::Forms::DataGridView^  EdgeGridView;
 	private: System::Windows::Forms::DataGridView^  MatrixGridView;
@@ -76,6 +76,13 @@ namespace graphex {
 	private: System::Windows::Forms::PropertyGrid^  GraphPropertyGrid;
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  FixedX;
 	private: System::Windows::Forms::DataGridViewTextBoxColumn^  FixedY;
+	private: System::Windows::Forms::MenuStrip^  menuStrip1;
+	private: System::Windows::Forms::ToolStripMenuItem^  vertexToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  edgeToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  graphToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  dInteractiveToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  graphMLToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  optionToolStripMenuItem;
 
 
 	protected: 
@@ -93,11 +100,6 @@ namespace graphex {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->btnVertices = (gcnew System::Windows::Forms::Button());
-			this->btnMatrix = (gcnew System::Windows::Forms::Button());
-			this->btnEdges = (gcnew System::Windows::Forms::Button());
-			this->btnLayout = (gcnew System::Windows::Forms::Button());
-			this->btnOptions = (gcnew System::Windows::Forms::Button());
 			this->VertexGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->Name = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 			this->FixedX = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
@@ -106,59 +108,18 @@ namespace graphex {
 			this->MatrixGridView = (gcnew System::Windows::Forms::DataGridView());
 			this->graphpanel = (gcnew System::Windows::Forms::Panel());
 			this->GraphPropertyGrid = (gcnew System::Windows::Forms::PropertyGrid());
+			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
+			this->vertexToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->edgeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->graphToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->dInteractiveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->graphMLToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->optionToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->MatrixGridView))->BeginInit();
+			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
-			// 
-			// btnVertices
-			// 
-			this->btnVertices->Location = System::Drawing::Point(13, 13);
-			this->btnVertices->Name = L"btnVertices";
-			this->btnVertices->Size = System::Drawing::Size(75, 57);
-			this->btnVertices->TabIndex = 0;
-			this->btnVertices->Text = L"Vertices";
-			this->btnVertices->UseVisualStyleBackColor = true;
-			this->btnVertices->Click += gcnew System::EventHandler(this, &Form1::btnVertices_Click);
-			// 
-			// btnMatrix
-			// 
-			this->btnMatrix->Location = System::Drawing::Point(12, 139);
-			this->btnMatrix->Name = L"btnMatrix";
-			this->btnMatrix->Size = System::Drawing::Size(75, 57);
-			this->btnMatrix->TabIndex = 1;
-			this->btnMatrix->Text = L"Matrix";
-			this->btnMatrix->UseVisualStyleBackColor = true;
-			this->btnMatrix->Click += gcnew System::EventHandler(this, &Form1::btnMatrix_Click);
-			// 
-			// btnEdges
-			// 
-			this->btnEdges->Location = System::Drawing::Point(13, 76);
-			this->btnEdges->Name = L"btnEdges";
-			this->btnEdges->Size = System::Drawing::Size(75, 57);
-			this->btnEdges->TabIndex = 2;
-			this->btnEdges->Text = L"Edges";
-			this->btnEdges->UseVisualStyleBackColor = true;
-			// 
-			// btnLayout
-			// 
-			this->btnLayout->Location = System::Drawing::Point(12, 202);
-			this->btnLayout->Name = L"btnLayout";
-			this->btnLayout->Size = System::Drawing::Size(75, 57);
-			this->btnLayout->TabIndex = 3;
-			this->btnLayout->Text = L"Graph";
-			this->btnLayout->UseVisualStyleBackColor = true;
-			this->btnLayout->Click += gcnew System::EventHandler(this, &Form1::btnLayout_Click);
-			// 
-			// btnOptions
-			// 
-			this->btnOptions->Location = System::Drawing::Point(12, 265);
-			this->btnOptions->Name = L"btnOptions";
-			this->btnOptions->Size = System::Drawing::Size(75, 57);
-			this->btnOptions->TabIndex = 4;
-			this->btnOptions->Text = L"Options";
-			this->btnOptions->UseVisualStyleBackColor = true;
-			this->btnOptions->Click += gcnew System::EventHandler(this, &Form1::btnOptions_Click);
 			// 
 			// VertexGridView
 			// 
@@ -166,7 +127,7 @@ namespace graphex {
 			this->VertexGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 			this->VertexGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(3) {this->Name, 
 				this->FixedX, this->FixedY});
-			this->VertexGridView->Location = System::Drawing::Point(166, 13);
+			this->VertexGridView->Location = System::Drawing::Point(166, 27);
 			this->VertexGridView->Name = L"VertexGridView";
 			this->VertexGridView->RowHeadersWidth = 30;
 			this->VertexGridView->Size = System::Drawing::Size(151, 150);
@@ -193,7 +154,7 @@ namespace graphex {
 			// EdgeGridView
 			// 
 			this->EdgeGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->EdgeGridView->Location = System::Drawing::Point(353, 13);
+			this->EdgeGridView->Location = System::Drawing::Point(352, 27);
 			this->EdgeGridView->Name = L"EdgeGridView";
 			this->EdgeGridView->Size = System::Drawing::Size(140, 150);
 			this->EdgeGridView->TabIndex = 6;
@@ -203,7 +164,7 @@ namespace graphex {
 			this->MatrixGridView->AllowUserToAddRows = false;
 			this->MatrixGridView->AllowUserToDeleteRows = false;
 			this->MatrixGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-			this->MatrixGridView->Location = System::Drawing::Point(518, 13);
+			this->MatrixGridView->Location = System::Drawing::Point(523, 27);
 			this->MatrixGridView->Name = L"MatrixGridView";
 			this->MatrixGridView->RowHeadersWidth = 100;
 			this->MatrixGridView->Size = System::Drawing::Size(128, 150);
@@ -212,7 +173,7 @@ namespace graphex {
 			// 
 			// graphpanel
 			// 
-			this->graphpanel->Location = System::Drawing::Point(672, 13);
+			this->graphpanel->Location = System::Drawing::Point(671, 27);
 			this->graphpanel->Name = L"graphpanel";
 			this->graphpanel->Size = System::Drawing::Size(149, 150);
 			this->graphpanel->TabIndex = 8;
@@ -232,6 +193,59 @@ namespace graphex {
 			this->GraphPropertyGrid->TabIndex = 9;
 			this->GraphPropertyGrid->PropertyValueChanged += gcnew System::Windows::Forms::PropertyValueChangedEventHandler(this, &Form1::GraphPropertyGrid_PropertyValueChanged);
 			// 
+			// menuStrip1
+			// 
+			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(4) {this->vertexToolStripMenuItem, 
+				this->edgeToolStripMenuItem, this->graphToolStripMenuItem, this->optionToolStripMenuItem});
+			this->menuStrip1->Location = System::Drawing::Point(0, 0);
+			this->menuStrip1->Name = L"menuStrip1";
+			this->menuStrip1->Size = System::Drawing::Size(859, 24);
+			this->menuStrip1->TabIndex = 10;
+			this->menuStrip1->Text = L"menuStrip1";
+			// 
+			// vertexToolStripMenuItem
+			// 
+			this->vertexToolStripMenuItem->Name = L"vertexToolStripMenuItem";
+			this->vertexToolStripMenuItem->Size = System::Drawing::Size(51, 20);
+			this->vertexToolStripMenuItem->Text = L"Vertex";
+			this->vertexToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::vertexToolStripMenuItem_Click);
+			// 
+			// edgeToolStripMenuItem
+			// 
+			this->edgeToolStripMenuItem->Name = L"edgeToolStripMenuItem";
+			this->edgeToolStripMenuItem->Size = System::Drawing::Size(43, 20);
+			this->edgeToolStripMenuItem->Text = L"Edge";
+			this->edgeToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::edgeToolStripMenuItem_Click);
+			// 
+			// graphToolStripMenuItem
+			// 
+			this->graphToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->dInteractiveToolStripMenuItem, 
+				this->graphMLToolStripMenuItem});
+			this->graphToolStripMenuItem->Name = L"graphToolStripMenuItem";
+			this->graphToolStripMenuItem->Size = System::Drawing::Size(48, 20);
+			this->graphToolStripMenuItem->Text = L"Graph";
+			// 
+			// dInteractiveToolStripMenuItem
+			// 
+			this->dInteractiveToolStripMenuItem->Name = L"dInteractiveToolStripMenuItem";
+			this->dInteractiveToolStripMenuItem->Size = System::Drawing::Size(143, 22);
+			this->dInteractiveToolStripMenuItem->Text = L"2D Interactive";
+			this->dInteractiveToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::dInteractiveToolStripMenuItem_Click);
+			// 
+			// graphMLToolStripMenuItem
+			// 
+			this->graphMLToolStripMenuItem->Name = L"graphMLToolStripMenuItem";
+			this->graphMLToolStripMenuItem->Size = System::Drawing::Size(143, 22);
+			this->graphMLToolStripMenuItem->Text = L"GraphML";
+			this->graphMLToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::graphMLToolStripMenuItem_Click);
+			// 
+			// optionToolStripMenuItem
+			// 
+			this->optionToolStripMenuItem->Name = L"optionToolStripMenuItem";
+			this->optionToolStripMenuItem->Size = System::Drawing::Size(51, 20);
+			this->optionToolStripMenuItem->Text = L"Option";
+			this->optionToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::optionToolStripMenuItem_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -242,16 +256,16 @@ namespace graphex {
 			this->Controls->Add(this->MatrixGridView);
 			this->Controls->Add(this->EdgeGridView);
 			this->Controls->Add(this->VertexGridView);
-			this->Controls->Add(this->btnOptions);
-			this->Controls->Add(this->btnLayout);
-			this->Controls->Add(this->btnEdges);
-			this->Controls->Add(this->btnMatrix);
-			this->Controls->Add(this->btnVertices);
+			this->Controls->Add(this->menuStrip1);
+			this->MainMenuStrip = this->menuStrip1;
 			this->Text = L"Raven\'s Point Graph Explorer";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->MatrixGridView))->EndInit();
+			this->menuStrip1->ResumeLayout(false);
+			this->menuStrip1->PerformLayout();
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
@@ -546,6 +560,119 @@ private: System::Void GraphPropertyGrid_PropertyValueChanged(System::Object^  s,
 				 theGraph.Clear();
 				 theGraph.OpenDB();
 			 }
+		 }
+private: System::Void dInteractiveToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 // display the graph panel
+			 HideAll();
+			 myCurDisplay = graph;
+			 graphpanel->Show();
+			 System::Drawing::Rectangle r = this->ClientRectangle;
+			 graphpanel->Location = System::Drawing::Point(130, 25);
+			 graphpanel->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+
+			 if( ! theGraph.IsPlanar() ) {
+				 Graphics^ g = graphpanel->CreateGraphics();
+				 g->DrawString(
+					 L"ERROR: Graph is not Planar",
+					 gcnew System::Drawing::Font( "Arial",16 ),
+					 gcnew SolidBrush( Color::Red ),
+					 25,25 );
+				 delete g;
+				 return;
+			 }
+			 // update the layout
+			 switch( *(theOptions->myLayout) ) {
+				 case eLayout::Manual:
+				 default:
+					 break;
+				 case eLayout::Circle:
+					 theGraph.ArrangeCircle();
+					 break;
+				 case eLayout::Spring:
+					 theGraph.ArrangeKK();
+					 break;
+			 }
+
+			 theGraph.MapColor();
+
+
+			 // redraw it
+			 graphpanel->Invalidate();		
+		 }
+private: System::Void graphMLToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 theGraph.ReadGraphML();
+		 }
+private: System::Void optionToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 HideAll();
+			 myCurDisplay = options;
+			 GraphPropertyGrid->Show();
+			 System::Drawing::Rectangle r = this->ClientRectangle;
+			 GraphPropertyGrid->Location = System::Drawing::Point(130, 25);
+			 GraphPropertyGrid->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+		 }
+private: System::Void edgeToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			  HideAll();
+			 MatrixGridView->Show();
+			 System::Drawing::Rectangle r = this->ClientRectangle;
+			 MatrixGridView->Location = System::Drawing::Point(130, 25);
+			 MatrixGridView->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+
+			 // Add row and column for each vertex
+			MatrixGridView->RowCount = theGraph.getVertexCount();
+			MatrixGridView->ColumnCount = theGraph.getVertexCount();
+			for( int kv = 0; kv < theGraph.getVertexCount(); kv++ )
+			{
+				MatrixGridView->Columns[kv]->HeaderText = gcnew String( theGraph.getNameVertex( kv ).c_str() );
+				MatrixGridView->Rows[kv]->HeaderCell->Value = gcnew String( theGraph.getNameVertex( kv ).c_str() );
+
+				for( int kc = kv; kc <  theGraph.getVertexCount(); kc++ ) {
+					MatrixGridView->Rows[kv]->Cells[kc]->Style->BackColor = Color::Wheat;
+				}
+
+				MatrixGridView->Columns[kv]->Width = 50;
+	
+			}
+
+
+			int a,b;
+			for( int ke = 0; ke < theGraph.getEdgeCount(); ke++ ) {
+				theGraph.getEdge( a, b, ke );
+				MatrixGridView->Rows[a]->Cells[b]->Value = L"1";
+			}
+		 }
+private: System::Void vertexToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 HideAll();
+			 VertexGridView->Show();
+			 System::Drawing::Rectangle r = this->ClientRectangle;
+			 VertexGridView->Location = System::Drawing::Point(130, 25);
+			 VertexGridView->Size = System::Drawing::Size(r.Width - 150, r.Height - 50 );
+
+			 flagfilling = true;
+
+			 if( theGraph.getVertexCount() < 1 ) {
+				 VertexGridView->Rows->Clear();
+				 flagfilling = false;
+				 return;
+			 }
+
+			VertexGridView->RowCount = theGraph.getVertexCount()+1;
+			for( int kv = 0; kv < theGraph.getVertexCount(); kv++ )
+			{
+				VertexGridView->Rows[kv]->Cells[0]->Value =
+					gcnew String( theGraph.getNameVertex( kv ).c_str() );
+				if( theGraph.IsPinned(kv) ) {
+					double x,y;
+					theGraph.getVertexLocation( x, y, kv );
+					VertexGridView->Rows[kv]->Cells[1]->Value = x;
+					VertexGridView->Rows[kv]->Cells[2]->Value = y;
+				} else {
+					// vertex is not pinned
+					VertexGridView->Rows[kv]->Cells[1]->Value = nullptr;
+					VertexGridView->Rows[kv]->Cells[2]->Value = nullptr;
+				}
+			}
+
+			flagfilling = false;
 		 }
 };
 }

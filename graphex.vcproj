@@ -41,6 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="-Zm134"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(BOOSTROOT);$(RAVENROOT)"
 				PreprocessorDefinitions="WIN32;_DEBUG"
@@ -60,8 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
+				AdditionalDependencies="$(NoInherit);boost_graph-vc90-mt-1_51.lib"
+				OutputFile="$(SolutionDir)\bin\$(ProjectName).exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(BOOSTROOT)/lib"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 				SubSystem="2"
@@ -211,6 +214,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ravenset\cUTF.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\graphex.cpp"
 				>
 			</File>
@@ -284,6 +299,10 @@
 			>
 			<File
 				RelativePath=".\cOptions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ravenset\cUTF.h"
 				>
 			</File>
 			<File
