@@ -19,3 +19,5 @@
 #include "pin_kkspring_layout.hpp"
 
 #include <cutf.h>
+
+#include "raven_sqlite.h"

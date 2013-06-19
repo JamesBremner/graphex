@@ -1,22 +1,22 @@
 #include "stdafx.h"
-#include "cGraph.h"
 
+#include "cGraph.h"
 
 
 cGraph theGraph;
 
 cGraph::cGraph(  )
 : myVertexBoxSize( 30 )
+, myScreenOriginX( 250 )
+, myScreenOriginY( 250 )
 {}
 
 	// Open the database file
-bool cGraph::OpenDB()
+bool cGraph::OpenDB( const std::wstring& n )
 {
 	theDB.Close();
 
-	String^ n1 = theOptions->myDBFilepath;
-	std::wstring n2 = msclr::interop::marshal_as<std::wstring>(n1);
-	theDB.Open( n2 );
+	theDB.Open( n );
 	if( theDB.myError )
 		return false;
 	theDB.Query(
@@ -162,14 +162,14 @@ bool cGraph::IsEdge( int iva, int ivb )
   @return 2 index out of range, no change made
 
 */
-int cGraph::setNameVertex( int i,  System::String^ n )
+int cGraph::setNameVertex( int i,  const std::wstring& n )
 {
 	if( 0 > i || i >= getVertexCount() )
 		return 2;
-	if( FindVertex(  msclr::interop::marshal_as<std::wstring>( n ) ) )
+	if( FindVertex( n ) )
 		return 1;
 	graph_t::vertex_descriptor v = *vertices(myGraph).first;
-	myGraph[v+i].myName =  msclr::interop::marshal_as<std::wstring>( n );
+	myGraph[v+i].myName =  n;
 	return 0;
 }
 /**
@@ -222,6 +222,24 @@ void cGraph::getVertexLocation( double& x, double& y, int i )
 		return;
 	x = myGraph[ *vertices(myGraph).first + i ].getLocationX();
 	y = myGraph[ *vertices(myGraph).first + i ].getLocationY();
+}
+cVertex& cGraph::getVertex( int i )
+{
+	if( 0 > i || i >= getVertexCount() ) {
+		static cVertex vertex_null;
+		return vertex_null;
+	}
+	return  myGraph[ *vertices(myGraph).first + i ];
+}
+cVertex& cGraph::getVertexSelected()
+{
+	vertex_iter_t vi, vi_end;
+	tie(vi, vi_end) = vertices(myGraph);
+	if( mySelectedVertex == vi_end ) { 
+		static cVertex vertex_null;
+		return vertex_null;
+	}
+	return  myGraph[ *mySelectedVertex ];
 }
 
 
@@ -380,53 +398,27 @@ void cGraph::MapColor()
 		myGraph,
 		get(&cVertex::myColor,myGraph) );
 }
-/**
 
-  Draw graph on screen
 
-  @param[in] g The graphics context of the window where the drawing is reuired
-
-*/
-void cGraph::DrawLayout( System::Drawing::Graphics^ g )
+void cGraph::WriteGraphML( const std::wstring& n)
 {
-	using namespace System::Drawing;
-
-	/** Draw the edges
-
-	This is done first so that the vertexes will overwrite the edges
-
-	*/
-	int a,b;
-	graph_t::vertex_descriptor v0 = *vertices(myGraph).first;
-	edge_iter_t ei, ei_end;
-	for( tie(ei, ei_end) = edges( myGraph ); ei != ei_end; ei++ ) {
-		a=source(*ei,myGraph);
-		b=target(*ei,myGraph);
-		g->DrawLine( gcnew Pen(Color::Black, 3),
-				 myGraph[v0+a].getScreenX(), myGraph[v0+a].getScreenY(),
-				 myGraph[v0+b].getScreenX(), myGraph[v0+b].getScreenY() );
-	}
-
-	// Draw the vertices
 	vertex_iter_t vi, vi_end;
 	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
-		myGraph[*vi].Draw( g );
+		myGraph[*vi].ConvertToUTF8();
 	}
-
-	// Highlight selected vertex
-	if( mySelectedVertex != vi_end ) {
-		myGraph[ * mySelectedVertex ].DrawAsSelected( g );
-	}
+	boost::dynamic_properties dp;
+	dp.property("name", boost::get(&cVertex::myName_utf8, myGraph));
+	std::ofstream fout( n.c_str() );
+	boost::write_graphml( fout, myGraph, dp, true );
 
 }
-void cGraph::ReadGraphML()
+void cGraph::ReadGraphML(const std::wstring& n)
 {
 
 	boost::dynamic_properties dp;
 	dp.property("name", boost::get(&cVertex::myName_utf8, myGraph));
+	//dp.property("weight",boost::get(&cEdge::iw, myGraph ));
 
-	//std::ofstream fout( "test2.gml");
-	//boost::write_graphml( fout, myGraph, dp, true );
 
 	//dp.property("color", boost::get(&cVertex::myColor, myGraph));
 
@@ -435,7 +427,8 @@ void cGraph::ReadGraphML()
 	//dp.property("graphname", graphname_map );
 
 	myGraph.clear();
-	std::ifstream fin("test.gml");
+	std::ifstream fin;
+	fin.open(n.c_str(), std::ifstream::in);
 	if( ! fin.is_open() ) {
 		return;
 	}
@@ -444,60 +437,14 @@ void cGraph::ReadGraphML()
 	//myGraph[boost::graph_bundle].myName = get(graphname_map,"graphname");
 
 	// convert from UTF8 to UTF16
-	//vertex_iter_t vi, vi_end;
-	//for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
-	//	myGraph[*vi].ConvertFromUTF8();
-	//}
-
-}
-
-/**
-
-  Draw vertex on screen
-
-  @param[in] g The graphics context of the window where the drawing is reuired
-
-*/
-void cVertex::Draw( System::Drawing::Graphics^ g  )
-{
-	using namespace System::Drawing;
-
-	// Represent vertex with a box of specified color
-	const int box_size = theGraph.getVertexBoxSize();
-	SolidBrush^ brush = gcnew SolidBrush(Color::Black);
-	switch( myColor ) {
-		case 0: brush->Color = Color::LightGreen; break;
-		case 1: brush->Color = Color::Red; break;
-		case 2: brush->Color = Color::Blue; break;
-		case 3: brush->Color = Color::Yellow; break;
+	vertex_iter_t vi, vi_end;
+	for (tie(vi, vi_end) = vertices(myGraph); vi != vi_end; ++vi) {
+		myGraph[*vi].ConvertFromUTF8();
 	}
 
-	int x = getScreenX();
-	int y = getScreenY();
-	g->FillRectangle( brush,
-		x-box_size/2,y-box_size/2,box_size,box_size);
-
-	// label the vertex
-	g->DrawString(gcnew System::String(myName.c_str()), 
-		gcnew Font( "Arial",16 ),
-		gcnew SolidBrush( Color::Black ),
-		(float)x-box_size/2,(float)y-box_size/2);
 }
-/**
 
-  Highlight vertex
 
-*/
-void cVertex::DrawAsSelected( System::Drawing::Graphics^ g )
-{
-	using namespace System::Drawing;
-	const int box_size = theGraph.getVertexBoxSize();
-	int x = getScreenX();
-	int y = getScreenY();
-	g->DrawRectangle( gcnew Pen( Color::Black,3.0f ),
-		x-box_size/2,y-box_size/2,box_size,box_size);
-
-}
 /**
 
   Is this vertex hit
@@ -510,9 +457,11 @@ void cVertex::DrawAsSelected( System::Drawing::Graphics^ g )
 */
 bool cVertex::IsHit( int mx, int my)
 {
-	int x = getScreenX();
-	int y = getScreenY();
 	int size = theGraph.getVertexBoxSize()/2;
+	int xo, yo;
+	theGraph.getScreenOrigin( xo, yo );
+	int x = (int)myPoint[0] + xo;
+	int y = (int)myPoint[1] + yo;
 	return ( x-size <= mx &&
 		mx <= x+ size &&
 		y-size <= my &&
@@ -536,4 +485,9 @@ void cVertex::ConvertFromUTF8()
 {
 	raven::cUTF utf( myName_utf8 );
 	myName = utf.get16();
+}
+void cVertex::ConvertToUTF8()
+{
+	raven::cUTF utf( myName );
+	myName_utf8 = utf.get8();
 }

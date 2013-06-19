@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit);boost_graph-vc90-mt-1_51.lib"
+				AdditionalDependencies="$(NoInherit)"
 				OutputFile="$(SolutionDir)\bin\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(BOOSTROOT)/lib"
@@ -210,11 +210,32 @@
 				>
 			</File>
 			<File
-				RelativePath=".\cGraph.cpp"
+				RelativePath=".\boost_graphml.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\ravenset\cUTF.cpp"
+				RelativePath=".\cGraph.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+						CompileAsManaged="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="$(RAVENROOT)\cUTF.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -228,6 +249,14 @@
 			<File
 				RelativePath=".\graphex.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAsManaged="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="$(RAVENROOT)\raven_sqlite.cpp"

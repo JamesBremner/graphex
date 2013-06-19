@@ -1,5 +1,5 @@
-#include "raven_sqlite.h"
-#include "cOptions.h"
+
+
 
 class cVertex
 {
@@ -11,13 +11,14 @@ public:
 	void setFixedLocation( double X, double Y )	{ myPoint[0] = X, myPoint[1] = Y; }
 	double getLocationX() { return myPoint[0]; }
 	double getLocationY() { return myPoint[1]; }
-	void Draw( System::Drawing::Graphics^ g );
-	void DrawAsSelected( System::Drawing::Graphics^ g );
+	//void Draw( System::Drawing::Graphics^ g );
+	//void DrawAsSelected( System::Drawing::Graphics^ g );
 	int getScreenX()			{  return (int)myPoint[0]+250; }
 	int getScreenY()			{  return (int)myPoint[1]+250; }
 	bool IsHit( int mx, int my );
 	void Move( int mx, int my );
 	void ConvertFromUTF8();
+	void ConvertToUTF8();
 
 
 	std::wstring myName;
@@ -45,6 +46,7 @@ public:
 	int a;
 	int b;
 	double myWeight;
+	int iw;
 };
 
 class cGraphProps {
@@ -58,9 +60,9 @@ class cGraph
 {
 public:
 	cGraph();
-	void setOptions( graphex::cOptions^ O )		{ theOptions = O; }
+	//void setOptions( graphex::cOptions^ O )		{ theOptions = O; }
 	void Clear()								{ myGraph.clear(); }
-	bool OpenDB();
+	bool OpenDB( const std::wstring& n );
 	void SaveToDB();
 	void LoadFromDB();
 	void SaveSelectedVertexLocationToDB();
@@ -74,7 +76,7 @@ public:
 	void MapColor();
 	bool IsPlanar();
 
-	int setNameVertex( int i,  System::String^ n );
+	int setNameVertex( int i,  const std::wstring& n );
 	const std::wstring& getNameVertex( int i );
 	int getVertexCount()			{ return boost::num_vertices( myGraph); }
 	bool FindVertex( const std::wstring& n );
@@ -82,21 +84,24 @@ public:
 	void setFixedLocation( int i,  double x, double y );
 	bool IsPinned( int i );
 	void getVertexLocation( double& x, double& y, int i );
+	cVertex& getVertex( int i );
+	cVertex& getVertexSelected();
 
 	int getEdgeCount()				{ return boost::num_edges( myGraph); }
 	bool getEdge( int& iva, int& iv, int ei );
 	bool IsEdge( int iva, int ivb );
 
 	int getVertexBoxSize()			{ return myVertexBoxSize; }
+	void getScreenOrigin( int&x, int& y )	{ x = myScreenOriginX; y = myScreenOriginY; }
 
-	void DrawLayout( System::Drawing::Graphics^ g );
 
 	void MouseClick( int x, int y );
 	bool IsSelectedVertex();
 	int  getVertexSelectedIndex();
 	void setLocationSelectedVertex( int mx, int my );
 
-	void ReadGraphML();
+	void ReadGraphML(const std::wstring& n);
+	void WriteGraphML( const std::wstring& n);
 
 private:
 
@@ -111,13 +116,16 @@ private:
 	typedef boost::graph_traits<graph_t>::vertex_iterator vertex_iter_t;
 
 	int myVertexBoxSize;
+	int myScreenOriginX;
+	int myScreenOriginY;	
+	
 	vertex_iter_t mySelectedVertex;
 
 	// The database
 	raven::sqlite::cDB theDB;
 
 	// The Options
-	gcroot< graphex::cOptions^ > theOptions;
+	//gcroot< graphex::cOptions^ > theOptions;
 
 };
 

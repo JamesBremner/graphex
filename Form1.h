@@ -42,8 +42,9 @@ namespace graphex {
 			theOptions = gcnew cOptions();
 			InitializeComponent();
 			GraphPropertyGrid->SelectedObject = theOptions;
-			theGraph.setOptions( theOptions );
-			theGraph.OpenDB();
+			//theGraph.setOptions( theOptions );
+			String^ n = theOptions->myDBFilepath;
+			theGraph.OpenDB(  msclr::interop::marshal_as<std::wstring>( n ));
 		} 
 
 	protected:
@@ -83,6 +84,9 @@ namespace graphex {
 	private: System::Windows::Forms::ToolStripMenuItem^  dInteractiveToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  graphMLToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  optionToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  readToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  writeToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^  newToolStripMenuItem;
 
 
 	protected: 
@@ -114,7 +118,10 @@ namespace graphex {
 			this->graphToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->dInteractiveToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->graphMLToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->readToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->writeToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->optionToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->newToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->VertexGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->EdgeGridView))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->MatrixGridView))->BeginInit();
@@ -219,8 +226,8 @@ namespace graphex {
 			// 
 			// graphToolStripMenuItem
 			// 
-			this->graphToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->dInteractiveToolStripMenuItem, 
-				this->graphMLToolStripMenuItem});
+			this->graphToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(3) {this->newToolStripMenuItem, 
+				this->dInteractiveToolStripMenuItem, this->graphMLToolStripMenuItem});
 			this->graphToolStripMenuItem->Name = L"graphToolStripMenuItem";
 			this->graphToolStripMenuItem->Size = System::Drawing::Size(48, 20);
 			this->graphToolStripMenuItem->Text = L"Graph";
@@ -228,16 +235,31 @@ namespace graphex {
 			// dInteractiveToolStripMenuItem
 			// 
 			this->dInteractiveToolStripMenuItem->Name = L"dInteractiveToolStripMenuItem";
-			this->dInteractiveToolStripMenuItem->Size = System::Drawing::Size(143, 22);
+			this->dInteractiveToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->dInteractiveToolStripMenuItem->Text = L"2D Interactive";
 			this->dInteractiveToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::dInteractiveToolStripMenuItem_Click);
 			// 
 			// graphMLToolStripMenuItem
 			// 
+			this->graphMLToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {this->readToolStripMenuItem, 
+				this->writeToolStripMenuItem});
 			this->graphMLToolStripMenuItem->Name = L"graphMLToolStripMenuItem";
-			this->graphMLToolStripMenuItem->Size = System::Drawing::Size(143, 22);
+			this->graphMLToolStripMenuItem->Size = System::Drawing::Size(152, 22);
 			this->graphMLToolStripMenuItem->Text = L"GraphML";
-			this->graphMLToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::graphMLToolStripMenuItem_Click);
+			// 
+			// readToolStripMenuItem
+			// 
+			this->readToolStripMenuItem->Name = L"readToolStripMenuItem";
+			this->readToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->readToolStripMenuItem->Text = L"Read";
+			this->readToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::readToolStripMenuItem_Click);
+			// 
+			// writeToolStripMenuItem
+			// 
+			this->writeToolStripMenuItem->Name = L"writeToolStripMenuItem";
+			this->writeToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->writeToolStripMenuItem->Text = L"Write";
+			this->writeToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::writeToolStripMenuItem_Click);
 			// 
 			// optionToolStripMenuItem
 			// 
@@ -245,6 +267,13 @@ namespace graphex {
 			this->optionToolStripMenuItem->Size = System::Drawing::Size(51, 20);
 			this->optionToolStripMenuItem->Text = L"Option";
 			this->optionToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::optionToolStripMenuItem_Click);
+			// 
+			// newToolStripMenuItem
+			// 
+			this->newToolStripMenuItem->Name = L"newToolStripMenuItem";
+			this->newToolStripMenuItem->Size = System::Drawing::Size(152, 22);
+			this->newToolStripMenuItem->Text = L"New";
+			this->newToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::newToolStripMenuItem_Click);
 			// 
 			// Form1
 			// 
@@ -455,7 +484,8 @@ private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System
 				 }
 				 int error = theGraph.setNameVertex(
 					 e->RowIndex,
-					 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() );
+					  msclr::interop::marshal_as<std::wstring>(
+						VertexGridView->Rows[e->RowIndex]->Cells[0]->Value->ToString() ) );
 				 if( error ) {
 					 // error returned from trying to set the vertex name
 					 // probably there is already a vertex with this name
@@ -465,7 +495,8 @@ private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System
 						 // there was no previous name
 						 // assign one that is likely to be unique
 						 old_name = L"_new_vertex_" + e->RowIndex.ToString();
-						 theGraph.setNameVertex( e->RowIndex, old_name );
+						 theGraph.setNameVertex( e->RowIndex,
+							  msclr::interop::marshal_as<std::wstring>( old_name ) );
 					 }
 					 // reset name to unique value
 					 VertexGridView->Rows[e->RowIndex]->Cells[0]->Value = old_name;
@@ -498,13 +529,65 @@ private: System::Void VertexGridView_CellEndEdit(System::Object^  sender, System
 
 		 Paint the graph layout panel
 
-*/
+		 */
 private: System::Void graphpanel_Paint(System::Object^  sender, System::Windows::Forms::PaintEventArgs^  e) {
 
 			 if( myCurDisplay != graph ) {
 				 return;
 			 }
-			 theGraph.DrawLayout( e->Graphics );
+
+			 // Draw the edges first,
+			 // so they end up behind the verices
+
+			 int xo, yo;
+			 theGraph.getScreenOrigin( xo, yo );
+
+			 for( int ke = 0; ke < theGraph.getEdgeCount(); ke++ ) {
+				 int iva, ivb;
+				 theGraph.getEdge( iva, ivb, ke );
+				 double xa, ya, xb, yb;
+				 theGraph.getVertexLocation( xa, ya, iva );
+				 theGraph.getVertexLocation( xb, yb, ivb );
+				 e->Graphics->DrawLine( gcnew Pen(Color::Black, 3),
+					 (float)xa+xo, (float)ya+yo, (float)xb+xo, (float)yb+yo );
+			 }
+			 // Draw the vertices
+			 for( int kv = 0; kv < theGraph.getVertexCount(); kv++ ) {
+				 double xv, yv;
+				 cVertex& v = theGraph.getVertex( kv );
+				 theGraph.getVertexLocation( xv, yv, kv );
+				 // Represent vertex with a box of specified color
+				 const int box_size = theGraph.getVertexBoxSize();
+				 SolidBrush^ brush = gcnew SolidBrush(Color::Black);
+				 switch( v.myColor ) {
+		case 0: brush->Color = Color::LightGreen; break;
+		case 1: brush->Color = Color::Red; break;
+		case 2: brush->Color = Color::Blue; break;
+		case 3: brush->Color = Color::Yellow; break;
+				 }
+
+				 int x = (int)xv + xo;
+				 int y = (int)yv + yo;
+				 e->Graphics->FillRectangle( brush,
+					 x-box_size/2,y-box_size/2,box_size,box_size);
+
+				 // label the vertex
+				 e->Graphics->DrawString(gcnew System::String(v.myName.c_str()), 
+					 gcnew System::Drawing::Font( "Arial",16 ),
+					 gcnew SolidBrush( Color::Black ),
+					 (float)x-box_size/2,(float)y-box_size/2);
+			 }
+
+  
+			 // Highlight selected vertex
+			 cVertex& v = theGraph.getVertexSelected();
+			 if( v.myName.length() ) {
+				 int x = (int)v.getLocationX()+xo;
+				 int y = (int)v.getLocationY()+yo;
+				 const int box_size = theGraph.getVertexBoxSize();
+				 e->Graphics->DrawRectangle( gcnew Pen( Color::Black,3.0f ),
+					x-box_size/2,y-box_size/2,box_size,box_size);
+			 }
 
 		 }
 private: System::Void VertexGridView_RowsRemoved(System::Object^  sender, System::Windows::Forms::DataGridViewRowsRemovedEventArgs^  e) {
@@ -558,7 +641,8 @@ private: System::Void graphpanel_MouseMove(System::Object^  sender, System::Wind
 private: System::Void GraphPropertyGrid_PropertyValueChanged(System::Object^  s, System::Windows::Forms::PropertyValueChangedEventArgs^  e) {
 			 if( e->ChangedItem->Label == "FilePath" ) {
 				 theGraph.Clear();
-				 theGraph.OpenDB();
+				 String^ n = theOptions->myDBFilepath;
+				 theGraph.OpenDB(msclr::interop::marshal_as<std::wstring>( n ));
 			 }
 		 }
 private: System::Void dInteractiveToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -599,9 +683,7 @@ private: System::Void dInteractiveToolStripMenuItem_Click(System::Object^  sende
 			 // redraw it
 			 graphpanel->Invalidate();		
 		 }
-private: System::Void graphMLToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
-			 theGraph.ReadGraphML();
-		 }
+
 private: System::Void optionToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
 			 HideAll();
 			 myCurDisplay = options;
@@ -673,6 +755,34 @@ private: System::Void vertexToolStripMenuItem_Click(System::Object^  sender, Sys
 			}
 
 			flagfilling = false;
+		 }
+private: System::Void writeToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
+
+			 openFileDialog1->Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+			 openFileDialog1->FilterIndex = 2;
+			 openFileDialog1->CheckFileExists = false;
+
+			 if ( openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK )
+			 {
+				 theGraph.WriteGraphML( msclr::interop::marshal_as<std::wstring>(openFileDialog1->FileName));
+			 }
+		 }
+private: System::Void readToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
+
+			 openFileDialog1->Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+			 openFileDialog1->FilterIndex = 2;
+
+			 if ( openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK )
+			 {
+				 theGraph.ReadGraphML(msclr::interop::marshal_as<std::wstring>(openFileDialog1->FileName));
+
+			 }
+		 }
+private: System::Void newToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			 theGraph.Clear();
+			graphpanel->Invalidate();	
 		 }
 };
 }
