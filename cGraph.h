@@ -35,18 +35,7 @@ public:
 	cEdge() 
 		:  myWeight(1.0)
 	{}
-	cEdge( int A, int B )
-		: a( A ), b( B )
-		, myWeight(1.0)
-
-	{}
-	bool operator ==( const cEdge& other ) const
-	{ return a == other.a && b == other.b; }
-
-	int a;
-	int b;
 	double myWeight;
-	int iw;
 };
 
 class cGraphProps {
