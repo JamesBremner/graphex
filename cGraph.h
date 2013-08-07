@@ -113,8 +113,7 @@ private:
 	// The database
 	raven::sqlite::cDB theDB;
 
-	// The Options
-	//gcroot< graphex::cOptions^ > theOptions;
+	bool IsGraphMLbyYED(const std::wstring& n);
 
 };
 

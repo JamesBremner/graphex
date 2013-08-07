@@ -407,17 +407,111 @@ void cGraph::WriteGraphML( const std::wstring& n)
 		myGraph[*vi].ConvertToUTF8();
 	}
 	boost::dynamic_properties dp;
-	dp.property("name", boost::get(&cVertex::myName_utf8, myGraph));
+	dp.property("label", boost::get(&cVertex::myName_utf8, myGraph));
 	std::ofstream fout( n.c_str() );
 	boost::write_graphml( fout, myGraph, dp, true );
 
 }
+/**
+
+  Check for a yEd file
+
+  @param[in] n  the filename
+  @return true if the file weas written by yED
+
+  The input file is copied to a new file graphex_processed.graphml
+  If the intput file was NOT produced by yEd, then the copy is perfect
+  If input was produced by yEd then the copy is filtered so that it can be
+  read by boost::read_graphml
+  Most of the yEd stuff is discarded, except for the node labels
+  the text of which are copied to a simple node attribute "label"
+
+*/
+
+bool cGraph::IsGraphMLbyYED(const std::wstring& n)
+{
+	bool yEd = false;
+
+	// open the input file
+	std::ifstream fin;
+	fin.open(n.c_str(), std::ifstream::in);
+	if( ! fin.is_open() ) {
+		return false;
+	}
+	// open the output file
+	std::ofstream fout;
+	fout.open("graphex_processed.graphml", std::ifstream::out );
+	if( ! fout.is_open() ) {
+		return false;
+	}
+
+
+	// loop over input file lines
+	fin.clear();
+	char buf[1000];
+	while( fin.good() ) {
+		fin.getline( buf,999 );
+		std::string l( buf ); 
+
+		// check for file produced by yEd
+		if( l.find("<!--Created by yFiles") != -1 ) {
+			yEd = true;
+			// convert NodeLabel text to simple label attribute
+			fout << "<key id=\"key0\" for=\"node\" attr.name=\"label\" attr.type=\"string\" />\n";
+		}
+
+		// check for file already identified as yEd
+		if( yEd ) {
+
+			// filter out yED attributes
+			if( l.find("<key") != -1 ) {
+				continue;
+			}
+			// convert NodeLabel text
+			if( l.find("<y:NodeLabel") != -1 ) {
+				int p = l.find(">")+1;
+				int q = l.find("<",p);
+				std::string label = l.substr(p,q-p);
+				fout << "<data key=\"key0\">" << label << "</data>\n";
+				continue;
+			}
+
+			// filter out outher yEd stuff
+			if( l.find("<y:") != -1 ) {
+				continue;
+			}
+			if( l.find("</y:") != -1 ) {
+				continue;
+			}
+			if( l.find("<data") != -1 ) {
+				continue;
+			}
+			if( l.find("</data") != -1 ) {
+				continue;
+			}
+		}
+		// copy input line to output
+		fout << buf << std::endl;
+	}
+
+	// close files
+	fin.close();
+	fout.close();
+
+	// return true if yED file
+	return yEd;
+	
+}
 void cGraph::ReadGraphML(const std::wstring& n)
 {
+	// check if file was produced by yEd
+	if( IsGraphMLbyYED( n ) ) {
+
+		int dbg = 1;
+	}
 
 	boost::dynamic_properties dp;
-	dp.property("name", boost::get(&cVertex::myName_utf8, myGraph));
-	//dp.property("weight",boost::get(&cEdge::iw, myGraph ));
+	dp.property("label", boost::get(&cVertex::myName_utf8, myGraph));
 
 
 	//dp.property("color", boost::get(&cVertex::myColor, myGraph));
@@ -428,7 +522,7 @@ void cGraph::ReadGraphML(const std::wstring& n)
 
 	myGraph.clear();
 	std::ifstream fin;
-	fin.open(n.c_str(), std::ifstream::in);
+	fin.open("graphex_processed.graphml", std::ifstream::in);
 	if( ! fin.is_open() ) {
 		return;
 	}
